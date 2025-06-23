@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, ReactNode } from 'react';
 
 type Language = 'en' | 'ta';
@@ -99,6 +98,28 @@ const translations = {
     required_field: "This field is required",
     invalid_amount: "Please enter a valid amount",
     invalid_contact: "Please enter a valid contact number",
+
+    // Bluetooth Printer
+    bluetooth_printer: "Bluetooth Printer",
+    scan_printers: "Scan for Printers",
+    scanning: "Scanning...",
+    printer_found: "Printer Found!",
+    no_printers_found: "No Printers Found",
+    printer_connected: "Printer Connected!",
+    connection_failed: "Connection Failed",
+    printer_disconnected: "Printer Disconnected",
+    disconnect_failed: "Disconnect Failed",
+    connected: "Connected",
+    not_connected: "Not Connected",
+    disconnect: "Disconnect",
+    available_printers: "Available Printers:",
+    bluetooth_print: "Bluetooth Print",
+    print_successful: "Print Successful!",
+    print_failed: "Print Failed",
+    printer_not_connected: "Printer Not Connected",
+    connect_printer_first: "Please connect a Bluetooth printer first",
+    receipt_printed: "Receipt Printed!",
+    summary_printed: "Summary Printed!",
   },
   ta: {
     // Splash Screen  
@@ -189,6 +210,28 @@ const translations = {
     required_field: "இந்த புலம் அவசியம்",
     invalid_amount: "சரியான தொகையை உள்ளிடவும்",
     invalid_contact: "சரியான தொடர்பு எண்ணை உள்ளிடவும்",
+
+    // Bluetooth Printer
+    bluetooth_printer: "Bluetooth பிரிண்டர்",
+    scan_printers: "பிரிண்டர் தேடு",
+    scanning: "ஸ்கேன் செய்கிறது...",
+    printer_found: "பிரிண்டர் கண்டுபிடிக்கப்பட்டது!",
+    no_printers_found: "பிரிண்டர் இல்லை",
+    printer_connected: "பிரிண்டர் இணைக்கப்பட்டது!",
+    connection_failed: "இணைப்பு தோல்வி",
+    printer_disconnected: "பிரிண்டர் துண்டிக்கப்பட்டது",
+    disconnect_failed: "துண்டிப்பு தோல்வி",
+    connected: "இணைக்கப்பட்டது",
+    not_connected: "இணைக்கப்படவில்லை",
+    disconnect: "துண்டி",
+    available_printers: "கிடைத்த பிரிண்டர்கள்:",
+    bluetooth_print: "Bluetooth பிரிண்ட்",
+    print_successful: "பிரிண்ட் வெற்றிகரமாக!",
+    print_failed: "பிரிண்ட் தோல்வி",
+    printer_not_connected: "பிரிண்டர் இணைக்கப்படவில்லை",
+    connect_printer_first: "முதலில் Bluetooth பிரிண்டரை இணைக்கவும்",
+    receipt_printed: "ரசீது அச்சிடப்பட்டது!",
+    summary_printed: "சுருக்கம் அச்சிடப்பட்டது!",
   }
 };
 

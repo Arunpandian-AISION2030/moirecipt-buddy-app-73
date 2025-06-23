@@ -1,9 +1,10 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { ArrowLeft, Download, Share2, Printer, PartyPopper } from "lucide-react";
+import { ArrowLeft, Download, Share2, Printer, PartyPopper, Bluetooth } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import BluetoothPrinterConnection from "./BluetoothPrinterConnection";
 
 interface BillData {
   clientName: string;
@@ -27,6 +28,8 @@ interface BillSummaryProps {
 const BillSummary = ({ billData, onBack }: BillSummaryProps) => {
   const { t, language } = useLanguage();
   const { toast } = useToast();
+  const [showBluetoothPrinter, setShowBluetoothPrinter] = useState(false);
+  const [printFunction, setPrintFunction] = useState<((text: string) => Promise<void>) | null>(null);
 
   const generateInvoiceNumber = () => {
     const date = new Date();
@@ -36,8 +39,6 @@ const BillSummary = ({ billData, onBack }: BillSummaryProps) => {
     const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
     return `MR${year}${month}${day}${random}`;
   };
-
-  const invoiceNumber = generateInvoiceNumber();
 
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
@@ -68,6 +69,77 @@ const BillSummary = ({ billData, onBack }: BillSummaryProps) => {
       cheque: t('cheque')
     };
     return modeMap[mode] || mode;
+  };
+
+  const invoiceNumber = generateInvoiceNumber();
+
+  const generatePrintableText = () => {
+    return `
+${language === 'ta' ? 'மோஇரிசிப்ட் - விழா ரசீது' : 'Moirecipt - Event Bill'}
+================================
+${t('invoice_number')}: ${invoiceNumber}
+
+${language === 'ta' ? 'வாடிக்கையாளர் விவரங்கள்' : 'CLIENT DETAILS'}
+--------------------------------
+${t('client_name')}: ${billData.clientName}
+${t('native_place')}: ${billData.nativePlace}
+${t('contact_number')}: ${billData.contactNumber}
+
+${language === 'ta' ? 'நிகழ்ச்சி விவரங்கள்' : 'EVENT DETAILS'}
+--------------------------------
+${t('function_type')}: ${getFunctionTypeDisplay(billData.functionType)}
+${t('function_date')}: ${formatDate(billData.functionDate)}
+${t('payment_mode')}: ${getPaymentModeDisplay(billData.paymentMode)}
+
+${t('venue_details')}:
+${billData.venueDetails}
+
+${t('services_provided')}:
+${billData.servicesProvided}
+
+${language === 'ta' ? 'பணம் விவரங்கள்' : 'PAYMENT DETAILS'}
+================================
+${t('total_amount')}: ${formatAmount(billData.totalAmount)}
+${t('advance_paid')}: ${formatAmount(billData.advancePaid)}
+${t('balance_due')}: ${formatAmount(billData.balanceDue)}
+
+${t('thank_you_message')}
+
+Generated: ${new Date().toLocaleString()}
+    `.trim();
+  };
+
+  const handleBluetoothPrint = async () => {
+    if (!printFunction) {
+      toast({
+        title: language === 'ta' ? "பிரிண்டர் இணைக்கப்படவில்லை" : "Printer Not Connected",
+        description: language === 'ta' ? 
+          "முதலில் Bluetooth பிரிண்டரை இணைக்கவும்" : 
+          "Please connect a Bluetooth printer first",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const printText = generatePrintableText();
+      await printFunction(printText);
+      
+      toast({
+        title: language === 'ta' ? "பிரிண்ட் வெற்றிகரமாக!" : "Print Successful!",
+        description: language === 'ta' ? 
+          "பில் அச்சிடப்பட்டது" : 
+          "Bill has been printed successfully",
+      });
+    } catch (error) {
+      toast({
+        title: language === 'ta' ? "பிரிண்ட் தோல்வி" : "Print Failed",
+        description: language === 'ta' ? 
+          "பில் அச்சிட முடியவில்லை" : 
+          "Failed to print the bill",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleDownloadPDF = () => {
@@ -121,6 +193,15 @@ ${t('thank_you_message')}`;
 
       {/* Bill Content */}
       <div className="max-w-4xl mx-auto p-4">
+        {/* Bluetooth Printer Connection */}
+        {showBluetoothPrinter && (
+          <div className="mb-6">
+            <BluetoothPrinterConnection 
+              onPrintRequest={(fn) => setPrintFunction(() => fn)}
+            />
+          </div>
+        )}
+
         <Card className="shadow-xl border-0 bg-white">
           <CardContent className="p-8">
             {/* Header */}
@@ -233,6 +314,27 @@ ${t('thank_you_message')}`;
 
         {/* Action Buttons */}
         <div className="flex flex-wrap gap-4 mt-6 print:hidden">
+          <Button
+            onClick={() => setShowBluetoothPrinter(!showBluetoothPrinter)}
+            className="flex-1 min-w-[200px] bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white"
+          >
+            <Bluetooth className="mr-2" size={20} />
+            {showBluetoothPrinter 
+              ? (language === 'ta' ? 'Bluetooth மறை' : 'Hide Bluetooth') 
+              : (language === 'ta' ? 'Bluetooth பிரிண்டர்' : 'Bluetooth Printer')
+            }
+          </Button>
+
+          {printFunction && (
+            <Button
+              onClick={handleBluetoothPrint}
+              className="flex-1 min-w-[200px] bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
+            >
+              <Printer className="mr-2" size={20} />
+              {language === 'ta' ? 'Bluetooth பிரிண்ட்' : 'Bluetooth Print'}
+            </Button>
+          )}
+
           <Button
             onClick={handleDownloadPDF}
             className="flex-1 min-w-[200px] bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
