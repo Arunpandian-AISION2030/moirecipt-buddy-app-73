@@ -13,6 +13,9 @@ interface MOIReceiptData {
   functionType: string;
   functionDate: string;
   contributorName: string;
+  contributorPlace: string;
+  relationship: string;
+  lastCompany: string;
   amount: string;
   paymentMode: string;
   timestamp: string;
@@ -37,26 +40,22 @@ const MOIReceiptPrint = ({ receiptData, customerData, onBack }: MOIReceiptPrintP
 
   const generateMOIReceiptText = (receipt: MOIReceiptData) => {
     return `
-${language === 'ta' ? 'மோஇரிசிப்ட் - MOI ரசீது' : 'Moirecipt - MOI Receipt'}
-================================
-${language === 'ta' ? 'ரசீது எண்' : 'Receipt No'}: ${receipt.receiptNumber}
+-----------------------------------------
+              MOI RECEIPT
+-----------------------------------------
+Name           : ${receipt.contributorName}
+Place          : ${receipt.contributorPlace || 'N/A'}
+Relationship   : ${receipt.relationship || 'N/A'}
+Last Company   : ${receipt.lastCompany || 'N/A'}
+MOI Amount     : ₹${receipt.amount}
 
-${language === 'ta' ? 'நிகழ்ச்சி விவரங்கள்' : 'FUNCTION DETAILS'}
---------------------------------
-${language === 'ta' ? 'வாடிக்கையாளர்' : 'Customer'}: ${receipt.customerName}
-${language === 'ta' ? 'நிகழ்ச்சி வகை' : 'Function Type'}: ${receipt.functionType}
-${language === 'ta' ? 'தேதி' : 'Date'}: ${receipt.functionDate}
+Function       : ${receipt.functionType}
+Date           : ${receipt.functionDate}
+-----------------------------------------
+Thank you for your presence and blessings!
 
-${language === 'ta' ? 'பங்களிப்பு விவரங்கள்' : 'CONTRIBUTION DETAILS'}
---------------------------------
-${language === 'ta' ? 'பங்களிப்பாளர்' : 'Contributor'}: ${receipt.contributorName}
-${language === 'ta' ? 'தொகை' : 'Amount'}: ₹${receipt.amount}
-${language === 'ta' ? 'பணம் கொடுத்த விதம்' : 'Payment Mode'}: ${receipt.paymentMode}
-
-${language === 'ta' ? 'நன்றி!' : 'Thank You!'}
-${language === 'ta' ? 'உங்கள் பங்களிப்புக்கு நன்றி!' : 'Thank you for your contribution!'}
-
-${language === 'ta' ? 'நேரம்' : 'Time'}: ${new Date(receipt.timestamp).toLocaleString()}
+Contact: www.moireceipt.com | 8248960558
+${language === 'ta' ? 'தமிழ் / English' : 'Tamil / English'}
     `.trim();
   };
 
@@ -220,14 +219,31 @@ ${language === 'ta' ? 'உருவாக்கப்பட்ட நேரம�
           </h3>
           
           {receiptData.map((receipt, index) => (
-            <Card key={index}>
-              <CardContent className="p-4">
+            <Card key={index} className="border border-gray-200">
+              <CardContent className="p-6">
+                {/* Preview of Receipt */}
+                <div className="bg-gray-50 p-4 rounded-lg mb-4 font-mono text-sm">
+                  <div className="text-center font-bold mb-2">MOI RECEIPT</div>
+                  <div className="border-t border-b border-gray-300 py-2 space-y-1">
+                    <div><strong>Name:</strong> {receipt.contributorName}</div>
+                    <div><strong>Place:</strong> {receipt.contributorPlace || 'N/A'}</div>
+                    <div><strong>Relationship:</strong> {receipt.relationship || 'N/A'}</div>
+                    <div><strong>Last Company:</strong> {receipt.lastCompany || 'N/A'}</div>
+                    <div><strong>MOI Amount:</strong> ₹{receipt.amount}</div>
+                  </div>
+                  <div className="pt-2 space-y-1">
+                    <div><strong>Function:</strong> {receipt.functionType}</div>
+                    <div><strong>Date:</strong> {receipt.functionDate}</div>
+                  </div>
+                  <div className="text-center text-xs mt-2 text-gray-600">
+                    Thank you for your presence and blessings!
+                  </div>
+                </div>
+                
                 <div className="flex justify-between items-center">
-                  <div className="flex-1">
-                    <h4 className="font-semibold">{receipt.contributorName}</h4>
+                  <div>
                     <p className="text-sm text-gray-600">
-                      {language === 'ta' ? 'தொகை:' : 'Amount:'} ₹{receipt.amount} | 
-                      {language === 'ta' ? ' ரசீது எண்:' : ' Receipt No:'} {receipt.receiptNumber}
+                      {language === 'ta' ? 'ரசீது எண்:' : 'Receipt No:'} {receipt.receiptNumber}
                     </p>
                   </div>
                   <Button

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +18,9 @@ interface MOIReceiptData {
   functionType: string;
   functionDate: string;
   contributorName: string;
+  contributorPlace: string;
+  relationship: string;
+  lastCompany: string;
   amount: string;
   paymentMode: string;
   timestamp: string;
@@ -25,6 +29,8 @@ interface MOIReceiptData {
 interface ContributorEntry {
   name: string;
   nativePlace: string;
+  relationship: string;
+  lastCompany: string;
   amount: string;
   paymentMode: string;
 }
@@ -39,7 +45,7 @@ const MOIReceiptEntry = ({ onBack, customerData }: MOIReceiptEntryProps) => {
   const { toast } = useToast();
   
   const [contributors, setContributors] = useState<ContributorEntry[]>([
-    { name: "", nativePlace: "", amount: "", paymentMode: "cash" }
+    { name: "", nativePlace: "", relationship: "", lastCompany: "", amount: "", paymentMode: "cash" }
   ]);
   
   const [showPrintView, setShowPrintView] = useState(false);
@@ -47,7 +53,7 @@ const MOIReceiptEntry = ({ onBack, customerData }: MOIReceiptEntryProps) => {
   const [printFunction, setPrintFunction] = useState<((text: string) => Promise<void>) | null>(null);
 
   const addContributor = () => {
-    setContributors([...contributors, { name: "", nativePlace: "", amount: "", paymentMode: "cash" }]);
+    setContributors([...contributors, { name: "", nativePlace: "", relationship: "", lastCompany: "", amount: "", paymentMode: "cash" }]);
   };
 
   const removeContributor = (index: number) => {
@@ -99,6 +105,9 @@ const MOIReceiptEntry = ({ onBack, customerData }: MOIReceiptEntryProps) => {
       functionType: customerData.functionType,
       functionDate: customerData.functionDate?.toLocaleDateString() || '',
       contributorName: contributor.name,
+      contributorPlace: contributor.nativePlace,
+      relationship: contributor.relationship,
+      lastCompany: contributor.lastCompany,
       amount: contributor.amount,
       paymentMode: contributor.paymentMode,
       timestamp: new Date().toISOString(),
@@ -127,26 +136,22 @@ const MOIReceiptEntry = ({ onBack, customerData }: MOIReceiptEntryProps) => {
     try {
       for (const receipt of receipts) {
         const printText = `
-${language === 'ta' ? 'மோஇரிசிப்ட் - MOI ரசீது' : 'Moirecipt - MOI Receipt'}
-================================
-${language === 'ta' ? 'ரசீது எண்' : 'Receipt No'}: ${receipt.receiptNumber}
+-----------------------------------------
+              MOI RECEIPT
+-----------------------------------------
+Name           : ${receipt.contributorName}
+Place          : ${receipt.contributorPlace || 'N/A'}
+Relationship   : ${receipt.relationship || 'N/A'}
+Last Company   : ${receipt.lastCompany || 'N/A'}
+MOI Amount     : ₹${receipt.amount}
 
-${language === 'ta' ? 'நிகழ்ச்சி விவரங்கள்' : 'FUNCTION DETAILS'}
---------------------------------
-${language === 'ta' ? 'வாடிக்கையாளர்' : 'Customer'}: ${receipt.customerName}
-${language === 'ta' ? 'நிகழ்ச்சி வகை' : 'Function Type'}: ${receipt.functionType}
-${language === 'ta' ? 'தேதி' : 'Date'}: ${receipt.functionDate}
+Function       : ${receipt.functionType}
+Date           : ${receipt.functionDate}
+-----------------------------------------
+Thank you for your presence and blessings!
 
-${language === 'ta' ? 'பங்களிப்பு விவரங்கள்' : 'CONTRIBUTION DETAILS'}
---------------------------------
-${language === 'ta' ? 'பங்களிப்பாளர்' : 'Contributor'}: ${receipt.contributorName}
-${language === 'ta' ? 'தொகை' : 'Amount'}: ₹${receipt.amount}
-${language === 'ta' ? 'பணம் கொடுத்த விதம்' : 'Payment Mode'}: ${receipt.paymentMode}
-
-${language === 'ta' ? 'நன்றி!' : 'Thank You!'}
-${language === 'ta' ? 'உங்கள் பங்களிப்புக்கு நன்றி!' : 'Thank you for your contribution!'}
-
-${language === 'ta' ? 'நேரம்' : 'Time'}: ${new Date(receipt.timestamp).toLocaleString()}
+Contact: www.moireceipt.com | 8248960558
+${language === 'ta' ? 'தமிழ் / English' : 'Tamil / English'}
         `.trim();
         
         await printFunction(printText);
@@ -206,7 +211,7 @@ Generated: ${new Date().toLocaleString()}
     toast({
       title: language === 'ta' ? "PDF डाउनलोड हुआ!" : "PDF Downloaded!",
       description: language === 'ta' ? 
-        "MOI ரசீது PDF डाउनलोड ஆனது" : 
+        "MOI ரசீது PDF डाउनलோड ஆனது" : 
         "MOI receipt summary downloaded successfully",
     });
     
@@ -374,7 +379,7 @@ Generated: ${new Date().toLocaleString()}
                     )}
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor={`name-${index}`} className="text-sm font-medium text-gray-700">
                         {t('contributor_name')} *
@@ -396,7 +401,33 @@ Generated: ${new Date().toLocaleString()}
                         id={`nativePlace-${index}`}
                         value={contributor.nativePlace}
                         onChange={(e) => updateContributor(index, 'nativePlace', e.target.value)}
-                        placeholder="Enter native place"
+                        placeholder="Enter place"
+                        className="mt-1"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor={`relationship-${index}`} className="text-sm font-medium text-gray-700">
+                        Relationship
+                      </Label>
+                      <Input
+                        id={`relationship-${index}`}
+                        value={contributor.relationship}
+                        onChange={(e) => updateContributor(index, 'relationship', e.target.value)}
+                        placeholder="Uncle, Friend, etc."
+                        className="mt-1"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor={`lastCompany-${index}`} className="text-sm font-medium text-gray-700">
+                        Last Company
+                      </Label>
+                      <Input
+                        id={`lastCompany-${index}`}
+                        value={contributor.lastCompany}
+                        onChange={(e) => updateContributor(index, 'lastCompany', e.target.value)}
+                        placeholder="TCS, Chennai"
                         className="mt-1"
                       />
                     </div>
