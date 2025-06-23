@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Camera, Upload, Plus, TrendingUp, Receipt, Languages } from "lucide-react";
+import { Camera, Upload, Plus, TrendingUp, Receipt, Languages, PartyPopper, FileText } from "lucide-react";
 import AddReceiptModal from "./AddReceiptModal";
 
 const Dashboard = () => {
@@ -18,6 +18,10 @@ const Dashboard = () => {
   ];
 
   const monthlyTotal = "₹2,340";
+
+  const handleNavigateToBills = () => {
+    window.location.href = '/bills';
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-green-50">
@@ -48,9 +52,44 @@ const Dashboard = () => {
           </h2>
         </div>
 
+        {/* Navigation Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <Card 
+            className="bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 shadow-xl cursor-pointer hover:scale-105 transition-transform duration-200"
+            onClick={() => {/* Keep current receipt functionality */}}
+          >
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Receipt size={24} />
+                {t('receipts_menu')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-lg mb-1">Regular receipts & expenses</div>
+              <div className="text-blue-100">Snap, save, track</div>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className="bg-gradient-to-r from-orange-500 to-red-600 text-white border-0 shadow-xl cursor-pointer hover:scale-105 transition-transform duration-200"
+            onClick={handleNavigateToBills}
+          >
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <PartyPopper size={24} />
+                {t('bills_menu')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-lg mb-1">Wedding & event billing</div>
+              <div className="text-orange-100">Professional invoices</div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Quick stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <Card className="bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 shadow-xl">
+          <Card className="bg-gradient-to-r from-green-500 to-blue-600 text-white border-0 shadow-xl">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <TrendingUp size={24} />
@@ -59,25 +98,25 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold mb-1">{monthlyTotal}</div>
-              <div className="text-blue-100">{t('this_month')}</div>
+              <div className="text-green-100">{t('this_month')}</div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-r from-green-500 to-blue-600 text-white border-0 shadow-xl">
+          <Card className="bg-gradient-to-r from-purple-500 to-pink-600 text-white border-0 shadow-xl">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
-                <Receipt size={24} />
-                {t('recent_receipts')}
+                <FileText size={24} />
+                Recent Activity
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold mb-1">{recentReceipts.length}</div>
-              <div className="text-green-100">This week</div>
+              <div className="text-purple-100">Items this week</div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Quick actions */}
+        {/* Quick actions for receipts */}
         <div className="mb-8">
           <h3 className="text-xl font-semibold text-gray-800 mb-4">{t('add_receipt')}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

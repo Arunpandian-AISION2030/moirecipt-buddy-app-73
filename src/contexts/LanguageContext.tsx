@@ -50,6 +50,55 @@ const translations = {
     // Login
     login_title: "Hey there! Let's log you in.",
     login_google: "Login with Google",
+
+    // Bill Entry Form
+    bill_entry_title: "Event Bill Entry 🎉",
+    client_name: "S.O. / D.O. Name",
+    native_place: "Native Place",
+    function_type: "Function Type",
+    function_date: "Date of Function",
+    venue_details: "Venue Name & Address",
+    contact_number: "Contact Number",
+    services_provided: "Items / Services Provided",
+    total_amount: "Amount Charged",
+    advance_paid: "Advance Paid",
+    balance_due: "Balance Due",
+    payment_mode: "Payment Mode",
+    
+    // Function Types
+    wedding: "Wedding",
+    birthday: "Birthday",
+    anniversary: "Anniversary",
+    other: "Other",
+    
+    // Payment Modes
+    cash: "Cash",
+    gpay: "GPay",
+    cheque: "Cheque",
+    upi: "UPI",
+    
+    // Bill Summary
+    bill_summary_title: "Event Bill Summary",
+    invoice_number: "Invoice No.",
+    thank_you_message: "Thank you for choosing us! Wishing you a beautiful celebration!",
+    
+    // Actions
+    create_bill: "Create Bill",
+    save_bill: "Save Bill",
+    print_bill: "Print Bill",
+    share_whatsapp: "Share via WhatsApp",
+    view_summary: "View Summary",
+    edit_bill: "Edit Bill",
+    
+    // Navigation
+    bills_menu: "Event Bills",
+    receipts_menu: "Receipts",
+    back: "Back",
+    
+    // Form validation
+    required_field: "This field is required",
+    invalid_amount: "Please enter a valid amount",
+    invalid_contact: "Please enter a valid contact number",
   },
   ta: {
     // Splash Screen  
@@ -91,6 +140,55 @@ const translations = {
     // Login
     login_title: "வாங்க நண்பா! உள்ளே போயிடலாம்.",
     login_google: "கூகிள் கொண்டு நுழையுங்கள்",
+
+    // Bill Entry Form
+    bill_entry_title: "விழா பில் என்ட்ரி 🎉",
+    client_name: "பெயர் (அப்பாவின் பெயர் உடன்)",
+    native_place: "ஊர் / சொந்த இடம்",
+    function_type: "நிகழ்ச்சி வகை",
+    function_date: "விழா தேதி",
+    venue_details: "விழா நடக்கும் இடம்",
+    contact_number: "தொடர்பு எண்",
+    services_provided: "வழங்கிய சேவைகள்",
+    total_amount: "பணம் (மொத்தம்)",
+    advance_paid: "முன்பணம்",
+    balance_due: "மீதி பணம்",
+    payment_mode: "பணம் கொடுத்த விதம்",
+    
+    // Function Types
+    wedding: "திருமணம்",
+    birthday: "வயது விழா",
+    anniversary: "ஆண்டு விழா",
+    other: "மற்றவை",
+    
+    // Payment Modes
+    cash: "பணம்",
+    gpay: "GPay",
+    cheque: "காசோலை",
+    upi: "UPI",
+    
+    // Bill Summary
+    bill_summary_title: "விழா பில் சுருக்கம்",
+    invoice_number: "பில் எண்.",
+    thank_you_message: "எங்களை தேர்ந்தெடுத்ததற்கு நன்றி! உங்கள் விழா இனிதாக நடைபெற வாழ்த்துகள்!",
+    
+    // Actions
+    create_bill: "பில் உருவாக்கு",
+    save_bill: "பில் சேமி",
+    print_bill: "பில் அச்சிடு",
+    share_whatsapp: "WhatsApp மூலம் பகிர்",
+    view_summary: "சுருக்கம் பார்",
+    edit_bill: "பில் மாற்று",
+    
+    // Navigation
+    bills_menu: "விழா பில்கள்",
+    receipts_menu: "ரசீதுகள்",
+    back: "பின்னால்",
+    
+    // Form validation
+    required_field: "இந்த புலம் அவசியம்",
+    invalid_amount: "சரியான தொகையை உள்ளிடவும்",
+    invalid_contact: "சரியான தொடர்பு எண்ணை உள்ளிடவும்",
   }
 };
 
