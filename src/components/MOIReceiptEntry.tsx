@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,6 +24,7 @@ interface MOIReceiptData {
 
 interface ContributorEntry {
   name: string;
+  nativePlace: string;
   amount: string;
   paymentMode: string;
 }
@@ -39,7 +39,7 @@ const MOIReceiptEntry = ({ onBack, customerData }: MOIReceiptEntryProps) => {
   const { toast } = useToast();
   
   const [contributors, setContributors] = useState<ContributorEntry[]>([
-    { name: "", amount: "", paymentMode: "cash" }
+    { name: "", nativePlace: "", amount: "", paymentMode: "cash" }
   ]);
   
   const [showPrintView, setShowPrintView] = useState(false);
@@ -47,7 +47,7 @@ const MOIReceiptEntry = ({ onBack, customerData }: MOIReceiptEntryProps) => {
   const [printFunction, setPrintFunction] = useState<((text: string) => Promise<void>) | null>(null);
 
   const addContributor = () => {
-    setContributors([...contributors, { name: "", amount: "", paymentMode: "cash" }]);
+    setContributors([...contributors, { name: "", nativePlace: "", amount: "", paymentMode: "cash" }]);
   };
 
   const removeContributor = (index: number) => {
@@ -374,7 +374,7 @@ Generated: ${new Date().toLocaleString()}
                     )}
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div>
                       <Label htmlFor={`name-${index}`} className="text-sm font-medium text-gray-700">
                         {t('contributor_name')} *
@@ -384,6 +384,19 @@ Generated: ${new Date().toLocaleString()}
                         value={contributor.name}
                         onChange={(e) => updateContributor(index, 'name', e.target.value)}
                         placeholder={t('enter_contributor_name')}
+                        className="mt-1"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor={`nativePlace-${index}`} className="text-sm font-medium text-gray-700">
+                        {t('native_place')}
+                      </Label>
+                      <Input
+                        id={`nativePlace-${index}`}
+                        value={contributor.nativePlace}
+                        onChange={(e) => updateContributor(index, 'nativePlace', e.target.value)}
+                        placeholder="Enter native place"
                         className="mt-1"
                       />
                     </div>

@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, ReactNode } from 'react';
 
 type Language = 'en' | 'ta';
@@ -154,7 +153,7 @@ const translations = {
     contributor: "Relation/Guest",
     contributor_name: "Relation/Guest Name",
     enter_contributor_name: "Enter relation/guest name",
-    add_contributor: "Add Relation/Guest",
+    add_contributor: "Add Relation",
     step_2_contributors: "Step 2: Relations/Guest",
     print_receipts: "Print Receipts",
     proceed_to_print: "Proceed to Print",
@@ -332,7 +331,7 @@ const translations = {
     contributor: "உறவினர்/விருந்தினர்",
     contributor_name: "உறவினர்/விருந்தினர் பெயர்",
     enter_contributor_name: "உறவினர்/விருந்தினர் பெயரை உள்ளிடவும்",
-    add_contributor: "உறவினர்/விருந்தினர் சேர்க்கவும்",
+    add_contributor: "உறவினர் சேர்க்கவும்",
     step_2_contributors: "படி 2: உறவினர்/விருந்தினர்",
     print_receipts: "ரசீதுகள் அச்சிடு",
     proceed_to_print: "அச்சிடல் தொடரவும்",
