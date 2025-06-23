@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,7 +19,6 @@ interface MOIReceiptData {
   contributorName: string;
   contributorPlace: string;
   relationship: string;
-  lastCompany: string;
   amount: string;
   paymentMode: string;
   timestamp: string;
@@ -30,7 +28,6 @@ interface ContributorEntry {
   name: string;
   nativePlace: string;
   relationship: string;
-  lastCompany: string;
   amount: string;
   paymentMode: string;
 }
@@ -45,7 +42,7 @@ const MOIReceiptEntry = ({ onBack, customerData }: MOIReceiptEntryProps) => {
   const { toast } = useToast();
   
   const [contributors, setContributors] = useState<ContributorEntry[]>([
-    { name: "", nativePlace: "", relationship: "", lastCompany: "", amount: "", paymentMode: "cash" }
+    { name: "", nativePlace: "", relationship: "", amount: "", paymentMode: "cash" }
   ]);
   
   const [showPrintView, setShowPrintView] = useState(false);
@@ -53,7 +50,7 @@ const MOIReceiptEntry = ({ onBack, customerData }: MOIReceiptEntryProps) => {
   const [printFunction, setPrintFunction] = useState<((text: string) => Promise<void>) | null>(null);
 
   const addContributor = () => {
-    setContributors([...contributors, { name: "", nativePlace: "", relationship: "", lastCompany: "", amount: "", paymentMode: "cash" }]);
+    setContributors([...contributors, { name: "", nativePlace: "", relationship: "", amount: "", paymentMode: "cash" }]);
   };
 
   const removeContributor = (index: number) => {
@@ -107,7 +104,6 @@ const MOIReceiptEntry = ({ onBack, customerData }: MOIReceiptEntryProps) => {
       contributorName: contributor.name,
       contributorPlace: contributor.nativePlace,
       relationship: contributor.relationship,
-      lastCompany: contributor.lastCompany,
       amount: contributor.amount,
       paymentMode: contributor.paymentMode,
       timestamp: new Date().toISOString(),
@@ -142,7 +138,6 @@ const MOIReceiptEntry = ({ onBack, customerData }: MOIReceiptEntryProps) => {
 Name           : ${receipt.contributorName}
 Place          : ${receipt.contributorPlace || 'N/A'}
 Relationship   : ${receipt.relationship || 'N/A'}
-Last Company   : ${receipt.lastCompany || 'N/A'}
 MOI Amount     : ₹${receipt.amount}
 
 Function       : ${receipt.functionType}
@@ -415,19 +410,6 @@ Generated: ${new Date().toLocaleString()}
                         value={contributor.relationship}
                         onChange={(e) => updateContributor(index, 'relationship', e.target.value)}
                         placeholder="Uncle, Friend, etc."
-                        className="mt-1"
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor={`lastCompany-${index}`} className="text-sm font-medium text-gray-700">
-                        Last Company
-                      </Label>
-                      <Input
-                        id={`lastCompany-${index}`}
-                        value={contributor.lastCompany}
-                        onChange={(e) => updateContributor(index, 'lastCompany', e.target.value)}
-                        placeholder="TCS, Chennai"
                         className="mt-1"
                       />
                     </div>

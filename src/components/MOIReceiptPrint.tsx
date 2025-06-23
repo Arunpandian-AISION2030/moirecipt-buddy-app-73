@@ -15,7 +15,6 @@ interface MOIReceiptData {
   contributorName: string;
   contributorPlace: string;
   relationship: string;
-  lastCompany: string;
   amount: string;
   paymentMode: string;
   timestamp: string;
@@ -46,7 +45,6 @@ const MOIReceiptPrint = ({ receiptData, customerData, onBack }: MOIReceiptPrintP
 Name           : ${receipt.contributorName}
 Place          : ${receipt.contributorPlace || 'N/A'}
 Relationship   : ${receipt.relationship || 'N/A'}
-Last Company   : ${receipt.lastCompany || 'N/A'}
 MOI Amount     : ₹${receipt.amount}
 
 Function       : ${receipt.functionType}
@@ -228,7 +226,6 @@ ${language === 'ta' ? 'உருவாக்கப்பட்ட நேரம�
                     <div><strong>Name:</strong> {receipt.contributorName}</div>
                     <div><strong>Place:</strong> {receipt.contributorPlace || 'N/A'}</div>
                     <div><strong>Relationship:</strong> {receipt.relationship || 'N/A'}</div>
-                    <div><strong>Last Company:</strong> {receipt.lastCompany || 'N/A'}</div>
                     <div><strong>MOI Amount:</strong> ₹{receipt.amount}</div>
                   </div>
                   <div className="pt-2 space-y-1">
