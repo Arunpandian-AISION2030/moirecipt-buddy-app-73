@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, ReactNode } from 'react';
 
 type Language = 'en' | 'ta';
@@ -23,12 +24,28 @@ const translations = {
     skip: "Skip",
     
     // Dashboard
-    dashboard_title: "Your Receipts at a Glance 👀",
+    dashboard_title: "Your Receipts & Bills Hub 📋",
+    dashboard_subtitle: "Manage receipts and event billing in one place",
     recent_receipts: "Recent Receipts",
+    recent_activity: "Recent Activity",
     monthly_summary: "Monthly Summary",
     add_receipt: "Add New Receipt",
     total_spent: "Total Spent",
     this_month: "This Month",
+    items_this_week: "Items this week",
+    
+    // Navigation & Descriptions
+    receipts_menu: "Receipts",
+    receipts_description: "Regular receipts & expenses",
+    receipts_subtitle: "Snap, save, track",
+    bills_menu: "Event Bills",
+    bills_description: "Wedding & event billing",
+    bills_subtitle: "Professional invoices",
+    
+    // Time references
+    today: "Today",
+    yesterday: "Yesterday",
+    two_days_ago: "2 days ago",
     
     // Categories
     food: "Food",
@@ -90,9 +107,9 @@ const translations = {
     edit_bill: "Edit Bill",
     
     // Navigation
-    bills_menu: "Event Bills",
-    receipts_menu: "Receipts",
     back: "Back",
+    home: "Home",
+    settings: "Settings",
     
     // Form validation
     required_field: "This field is required",
@@ -120,6 +137,16 @@ const translations = {
     connect_printer_first: "Please connect a Bluetooth printer first",
     receipt_printed: "Receipt Printed!",
     summary_printed: "Summary Printed!",
+
+    // MOI Receipt specific
+    moi_receipt_entry: "MOI Receipt Entry",
+    customer_function_entry: "Customer & Function Entry",
+    choose_bill_type: "Choose Bill Type",
+    traditional_bill: "Traditional Bill",
+    moi_receipt_description: "Record individual contributions for functions",
+    traditional_bill_description: "Create comprehensive event bills",
+    step_process: "Step 1: Customer & Function → Step 2: MOI Receipts",
+    single_form: "Single form with all billing details",
   },
   ta: {
     // Splash Screen  
@@ -135,12 +162,28 @@ const translations = {
     skip: "தவிர்",
     
     // Dashboard
-    dashboard_title: "உங்கள் ரசீதுகள்—all in one sight! 👀",
+    dashboard_title: "உங்கள் ரசீது & பில் மையம் 📋",
+    dashboard_subtitle: "ரசீதுகள் மற்றும் நிகழ்ச்சி பில்லிங் ஒரே இடத்தில்",
     recent_receipts: "புதிய ரசீதுகள்",
+    recent_activity: "சமீபத்திய செயல்பாடு",
     monthly_summary: "மாத செலவுகள்", 
     add_receipt: "புதிய ரசீது சேர்க்க",
     total_spent: "மொத்த செலவு",
     this_month: "இந்த மாதம்",
+    items_this_week: "இந்த வாரம் பொருட்கள்",
+    
+    // Navigation & Descriptions
+    receipts_menu: "ரசீதுகள்",
+    receipts_description: "வழக்கமான ரசீதுகள் & செலவுகள்",
+    receipts_subtitle: "எடு, சேமி, கண்காணி",
+    bills_menu: "விழா பில்கள்",
+    bills_description: "திருமணம் & நிகழ்ச்சி பில்லிங்",
+    bills_subtitle: "தொழில்முறை பில்கள்",
+    
+    // Time references
+    today: "இன்று",
+    yesterday: "நேற்று",
+    two_days_ago: "2 நாட்களுக்கு முன்",
     
     // Categories
     food: "சாப்பாடு",
@@ -150,10 +193,10 @@ const translations = {
     
     // Actions
     snap_now: "இப்போதே எடு!",
-    upload: "ஊடுருவு படம் சேர்!",
+    upload: "பதிவேற்று",
     edit: "மாற்று",
     share: "பகிர்",
-    download_pdf: "PDF ஆக இறக்குமதி செய்",
+    download_pdf: "PDF ஆக இறக்கு",
     
     // Empty states
     no_receipts: "இன்னும் ரசீதுகள் இல்ல... வாங்க ஒரு புதியதை சேர்!",
@@ -202,9 +245,9 @@ const translations = {
     edit_bill: "பில் மாற்று",
     
     // Navigation
-    bills_menu: "விழா பில்கள்",
-    receipts_menu: "ரசீதுகள்",
     back: "பின்னால்",
+    home: "வீடு",
+    settings: "அமைப்புகள்",
     
     // Form validation
     required_field: "இந்த புலம் அவசியம்",
@@ -232,6 +275,16 @@ const translations = {
     connect_printer_first: "முதலில் Bluetooth பிரிண்டரை இணைக்கவும்",
     receipt_printed: "ரசீது அச்சிடப்பட்டது!",
     summary_printed: "சுருக்கம் அச்சிடப்பட்டது!",
+
+    // MOI Receipt specific
+    moi_receipt_entry: "MOI ரசீது என்ட்ரி",
+    customer_function_entry: "வாடிக்கையாளர் & நிகழ்ச்சி என்ட்ரி",
+    choose_bill_type: "பில் வகையை தேர்ந்தெடுக்கவும்",
+    traditional_bill: "பாரம்பரிய பில்",
+    moi_receipt_description: "நிகழ்ச்சிகளுக்கான தனிப்பட்ட பங்களிப்புகளை பதிவு செய்யவும்",
+    traditional_bill_description: "விரிவான நிகழ்ச்சி பில்களை உருவாக்கவும்",
+    step_process: "படி 1: வாடிக்கையாளர் & நிகழ்ச்சி → படி 2: MOI ரசீதுகள்",
+    single_form: "அனைத்து பில்லிங் விவரங்களுடன் ஒற்றை படிவம்",
   }
 };
 

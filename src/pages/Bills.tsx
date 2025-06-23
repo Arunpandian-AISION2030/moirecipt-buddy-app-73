@@ -4,6 +4,10 @@ import BillEntryForm from "@/components/BillEntryForm";
 import BillSummary from "@/components/BillSummary";
 import CustomerFunctionEntry, { CustomerFunctionData } from "@/components/CustomerFunctionEntry";
 import MOIReceiptEntry from "@/components/MOIReceiptEntry";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, Languages, FileText, Receipt } from "lucide-react";
 
 interface BillData {
   clientName: string;
@@ -22,6 +26,7 @@ interface BillData {
 type ViewType = 'menu' | 'customer-function' | 'moi-receipt' | 'form' | 'summary';
 
 const Bills = () => {
+  const { t, toggleLanguage, language } = useLanguage();
   const [currentView, setCurrentView] = useState<ViewType>('menu');
   const [currentBillData, setCurrentBillData] = useState<BillData | null>(null);
   const [customerFunctionData, setCustomerFunctionData] = useState<CustomerFunctionData | null>(null);
@@ -56,54 +61,83 @@ const Bills = () => {
   if (currentView === 'menu') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50">
-        <div className="bg-gradient-to-r from-orange-600 to-red-600 text-white p-4">
-          <div className="max-w-4xl mx-auto flex items-center gap-4">
-            <button
-              onClick={handleBackToDashboard}
-              className="text-white hover:bg-white/20 p-2 rounded"
+        {/* Header - Responsive */}
+        <div className="bg-gradient-to-r from-orange-600 to-red-600 text-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between">
+            <div className="flex items-center gap-2 sm:gap-4">
+              <Button
+                onClick={handleBackToDashboard}
+                variant="ghost"
+                size="sm"
+                className="text-white hover:bg-white/20 p-2"
+              >
+                <ArrowLeft size={20} />
+              </Button>
+              <h1 className="text-lg sm:text-xl font-bold">{t('bills_menu')}</h1>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={toggleLanguage}
+              className="flex items-center gap-2 text-orange-600 border-white/30 hover:bg-white/10 hover:text-white text-xs sm:text-sm"
             >
-              ←
-            </button>
-            <h1 className="text-xl font-bold">Bill Management</h1>
+              <Languages size={16} />
+              {language === 'en' ? 'தமிழ்' : 'EN'}
+            </Button>
           </div>
         </div>
 
-        <div className="max-w-4xl mx-auto p-8">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">Choose Bill Type</h2>
-            <p className="text-gray-600">Select the type of billing you want to create</p>
+        {/* Main Content - Responsive */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+          <div className="text-center mb-6 sm:mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">{t('choose_bill_type')}</h2>
+            <p className="text-sm sm:text-base text-gray-600">{t('choose_bill_type')}</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {/* MOI Receipt Option */}
-            <div 
+            <Card 
               onClick={() => setCurrentView('customer-function')}
-              className="bg-gradient-to-r from-green-500 to-blue-600 text-white p-6 rounded-lg shadow-xl cursor-pointer hover:scale-105 transition-transform duration-200"
+              className="bg-gradient-to-r from-green-500 to-blue-600 text-white border-0 shadow-xl cursor-pointer hover:scale-105 transition-transform duration-200"
             >
-              <div className="text-center">
-                <div className="text-4xl mb-4">🧾</div>
-                <h3 className="text-xl font-bold mb-2">MOI Receipt Entry</h3>
-                <p className="text-green-100">Record individual contributions for functions</p>
-                <div className="mt-4 text-sm text-green-200">
-                  Step 1: Customer & Function → Step 2: MOI Receipts
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                  <Receipt size={20} className="sm:size-6" />
+                  {t('moi_receipt_entry')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center">
+                  <div className="text-3xl sm:text-4xl mb-4">🧾</div>
+                  <p className="text-green-100 text-sm sm:text-base mb-4">{t('moi_receipt_description')}</p>
+                  <div className="text-xs sm:text-sm text-green-200">
+                    {t('step_process')}
+                  </div>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
             {/* Traditional Bill Option */}
-            <div 
+            <Card 
               onClick={() => setCurrentView('form')}
-              className="bg-gradient-to-r from-orange-500 to-red-600 text-white p-6 rounded-lg shadow-xl cursor-pointer hover:scale-105 transition-transform duration-200"
+              className="bg-gradient-to-r from-orange-500 to-red-600 text-white border-0 shadow-xl cursor-pointer hover:scale-105 transition-transform duration-200"
             >
-              <div className="text-center">
-                <div className="text-4xl mb-4">📋</div>
-                <h3 className="text-xl font-bold mb-2">Traditional Bill</h3>
-                <p className="text-orange-100">Create comprehensive event bills</p>
-                <div className="mt-4 text-sm text-orange-200">
-                  Single form with all billing details
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                  <FileText size={20} className="sm:size-6" />
+                  {t('traditional_bill')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center">
+                  <div className="text-3xl sm:text-4xl mb-4">📋</div>
+                  <p className="text-orange-100 text-sm sm:text-base mb-4">{t('traditional_bill_description')}</p>
+                  <div className="text-xs sm:text-sm text-orange-200">
+                    {t('single_form')}
+                  </div>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
