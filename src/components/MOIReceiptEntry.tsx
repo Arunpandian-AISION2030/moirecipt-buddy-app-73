@@ -1,23 +1,31 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { ArrowLeft, Save, Receipt, Plus } from "lucide-react";
+import { ArrowLeft, ArrowRight, Languages, Plus, Trash2, Printer, Download, Bluetooth } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { CustomerFunctionData } from "./CustomerFunctionEntry";
-import { format } from "date-fns";
+import MOIReceiptPrint from "./MOIReceiptPrint";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import BluetoothPrinterConnection from "./BluetoothPrinterConnection";
 
-export interface MOIReceiptData {
-  name: string;
-  place: string;
-  relationship: string;
-  lastCompany: string;
-  moiAmount: string;
-  functionName: string;
+interface MOIReceiptData {
+  receiptNumber: string;
+  customerName: string;
+  functionType: string;
   functionDate: string;
+  contributorName: string;
+  amount: string;
+  paymentMode: string;
+  timestamp: string;
+}
+
+interface ContributorEntry {
+  name: string;
+  amount: string;
+  paymentMode: string;
 }
 
 interface MOIReceiptEntryProps {
@@ -26,309 +34,438 @@ interface MOIReceiptEntryProps {
 }
 
 const MOIReceiptEntry = ({ onBack, customerData }: MOIReceiptEntryProps) => {
-  const { t } = useLanguage();
+  const { t, toggleLanguage, language } = useLanguage();
   const { toast } = useToast();
   
-  const [receipts, setReceipts] = useState<MOIReceiptData[]>([]);
-  const [currentReceipt, setCurrentReceipt] = useState<MOIReceiptData>({
-    name: "",
-    place: "",
-    relationship: "",
-    lastCompany: "",
-    moiAmount: "",
-    functionName: customerData.functionType,
-    functionDate: customerData.functionDate ? format(customerData.functionDate, "dd/MM/yyyy") : "",
-  });
+  const [contributors, setContributors] = useState<ContributorEntry[]>([
+    { name: "", amount: "", paymentMode: "cash" }
+  ]);
+  
+  const [showPrintView, setShowPrintView] = useState(false);
+  const [showPrintModal, setShowPrintModal] = useState(false);
+  const [printFunction, setPrintFunction] = useState<((text: string) => Promise<void>) | null>(null);
 
-  const handleInputChange = (field: keyof MOIReceiptData, value: string) => {
-    setCurrentReceipt(prev => ({ ...prev, [field]: value }));
+  const addContributor = () => {
+    setContributors([...contributors, { name: "", amount: "", paymentMode: "cash" }]);
   };
 
-  const validateCurrentReceipt = () => {
-    const required = ['name', 'place', 'relationship', 'moiAmount'];
-    for (const field of required) {
-      if (!currentReceipt[field as keyof MOIReceiptData]) {
+  const removeContributor = (index: number) => {
+    if (contributors.length > 1) {
+      setContributors(contributors.filter((_, i) => i !== index));
+    }
+  };
+
+  const updateContributor = (index: number, field: keyof ContributorEntry, value: string) => {
+    const updated = contributors.map((contributor, i) => 
+      i === index ? { ...contributor, [field]: value } : contributor
+    );
+    setContributors(updated);
+  };
+
+  const validateForm = () => {
+    for (const contributor of contributors) {
+      if (!contributor.name.trim() || !contributor.amount.trim()) {
         toast({
-          title: "Validation Error",
-          description: "Please fill all required fields",
+          title: t('validation_error'),
+          description: t('required_field'),
+          variant: "destructive",
+        });
+        return false;
+      }
+      
+      if (isNaN(Number(contributor.amount)) || Number(contributor.amount) <= 0) {
+        toast({
+          title: t('validation_error'),
+          description: t('invalid_amount'),
           variant: "destructive",
         });
         return false;
       }
     }
-    
-    if (isNaN(Number(currentReceipt.moiAmount)) || Number(currentReceipt.moiAmount) <= 0) {
-      toast({
-        title: "Validation Error",
-        description: "Please enter a valid MOI amount",
-        variant: "destructive",
-      });
-      return false;
-    }
-    
     return true;
   };
 
-  const handleAddReceipt = () => {
-    if (validateCurrentReceipt()) {
-      setReceipts(prev => [...prev, currentReceipt]);
-      setCurrentReceipt({
-        name: "",
-        place: "",
-        relationship: "",
-        lastCompany: "",
-        moiAmount: "",
-        functionName: customerData.functionType,
-        functionDate: customerData.functionDate ? format(customerData.functionDate, "dd/MM/yyyy") : "",
-      });
-      toast({
-        title: "Success",
-        description: "MOI receipt added successfully!",
-      });
-    }
+  const generateReceiptNumber = () => {
+    const date = new Date();
+    const timestamp = date.getTime().toString().slice(-6);
+    return `MOI${timestamp}`;
   };
 
-  const handleSaveAll = () => {
-    if (receipts.length === 0) {
+  const generateReceiptData = (): MOIReceiptData[] => {
+    return contributors.map(contributor => ({
+      receiptNumber: generateReceiptNumber(),
+      customerName: customerData.customerName,
+      functionType: customerData.functionType,
+      functionDate: customerData.functionDate?.toLocaleDateString() || '',
+      contributorName: contributor.name,
+      amount: contributor.amount,
+      paymentMode: contributor.paymentMode,
+      timestamp: new Date().toISOString(),
+    }));
+  };
+
+  const handlePrint = () => {
+    if (!validateForm()) return;
+    setShowPrintModal(true);
+  };
+
+  const handleBluetoothPrint = async () => {
+    if (!printFunction) {
       toast({
-        title: "No Receipts",
-        description: "Please add at least one MOI receipt before saving",
-        variant: "destructive",
+        title: language === 'ta' ? "பிரிண்டர் இணைக்கப்படவில்லை" : "Printer Not Connected",
+        description: language === 'ta' ? 
+          "முதலில் Bluetooth பிரிண்டரை இணைக்கவும்" : 
+          "Please connect a Bluetooth printer first",
+        variant: "destructive"
       });
       return;
     }
+
+    const receipts = generateReceiptData();
     
-    toast({
-      title: "Success",
-      description: `Saved ${receipts.length} MOI receipts successfully!`,
-    });
+    try {
+      for (const receipt of receipts) {
+        const printText = `
+${language === 'ta' ? 'மோஇரிசிப்ட் - MOI ரசீது' : 'Moirecipt - MOI Receipt'}
+================================
+${language === 'ta' ? 'ரசீது எண்' : 'Receipt No'}: ${receipt.receiptNumber}
+
+${language === 'ta' ? 'நிகழ்ச்சி விவரங்கள்' : 'FUNCTION DETAILS'}
+--------------------------------
+${language === 'ta' ? 'வாடிக்கையாளர்' : 'Customer'}: ${receipt.customerName}
+${language === 'ta' ? 'நிகழ்ச்சி வகை' : 'Function Type'}: ${receipt.functionType}
+${language === 'ta' ? 'தேதி' : 'Date'}: ${receipt.functionDate}
+
+${language === 'ta' ? 'பங்களிப்பு விவரங்கள்' : 'CONTRIBUTION DETAILS'}
+--------------------------------
+${language === 'ta' ? 'பங்களிப்பாளர்' : 'Contributor'}: ${receipt.contributorName}
+${language === 'ta' ? 'தொகை' : 'Amount'}: ₹${receipt.amount}
+${language === 'ta' ? 'பணம் கொடுத்த விதம்' : 'Payment Mode'}: ${receipt.paymentMode}
+
+${language === 'ta' ? 'நன்றி!' : 'Thank You!'}
+${language === 'ta' ? 'உங்கள் பங்களிப்புக்கு நன்றி!' : 'Thank you for your contribution!'}
+
+${language === 'ta' ? 'நேரம்' : 'Time'}: ${new Date(receipt.timestamp).toLocaleString()}
+        `.trim();
+        
+        await printFunction(printText);
+      }
+      
+      toast({
+        title: language === 'ta' ? "அனைத்து ரசீதுகளும் அச்சிடப்பட்டன!" : "All Receipts Printed!",
+        description: language === 'ta' ? 
+          `${receipts.length} ரசீதுகள் அச்சிடப்பட்டன` : 
+          `${receipts.length} receipts printed successfully`,
+      });
+      
+      setShowPrintModal(false);
+    } catch (error) {
+      toast({
+        title: language === 'ta' ? "பிரிண்ட் தோல்வி" : "Print Failed",
+        description: language === 'ta' ? 
+          "ரசீதுகள் அச்சிட முடியவில்லை" : 
+          "Failed to print receipts",
+        variant: "destructive"
+      });
+    }
   };
 
-  const totalAmount = receipts.reduce((sum, receipt) => sum + Number(receipt.moiAmount), 0);
+  const handlePDFDownload = () => {
+    const receipts = generateReceiptData();
+    const totalAmount = receipts.reduce((sum, receipt) => sum + parseFloat(receipt.amount), 0);
+    
+    const pdfContent = `
+MOI Receipt Summary
+==================
+
+Customer: ${customerData.customerName}
+Function: ${customerData.functionType}
+Date: ${customerData.functionDate?.toLocaleDateString()}
+Venue: ${customerData.venuePlace}
+
+Contributors:
+${receipts.map((receipt, index) => 
+  `${index + 1}. ${receipt.contributorName} - ₹${receipt.amount} (${receipt.paymentMode})`
+).join('\n')}
+
+Total Amount: ₹${totalAmount.toLocaleString('en-IN')}
+Generated: ${new Date().toLocaleString()}
+    `;
+
+    const blob = new Blob([pdfContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `MOI_Receipt_${customerData.customerName}_${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: language === 'ta' ? "PDF डाउनलोड हुआ!" : "PDF Downloaded!",
+      description: language === 'ta' ? 
+        "MOI ரசீது PDF डाउनलोड ஆனது" : 
+        "MOI receipt summary downloaded successfully",
+    });
+    
+    setShowPrintModal(false);
+  };
+
+  const handleProceedToFullPrint = () => {
+    if (!validateForm()) return;
+    setShowPrintView(true);
+  };
+
+  if (showPrintView) {
+    const receiptData = generateReceiptData();
+    return (
+      <MOIReceiptPrint 
+        receiptData={receiptData}
+        customerData={{
+          customerName: customerData.customerName,
+          functionType: customerData.functionType,
+          functionDate: customerData.functionDate?.toLocaleDateString() || '',
+          venue: customerData.venuePlace,
+        }}
+        onBack={() => setShowPrintView(false)}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white p-4">
-        <div className="max-w-6xl mx-auto flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onBack}
-            className="text-white hover:bg-white/20"
-          >
-            <ArrowLeft size={20} />
-          </Button>
+      <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onBack}
+              className="text-white hover:bg-white/20 p-2"
+            >
+              <ArrowLeft size={20} />
+            </Button>
+            <h1 className="text-lg sm:text-xl font-bold">{t('moi_receipt_entry')}</h1>
+          </div>
           <div className="flex items-center gap-2">
-            <Receipt size={24} />
-            <h1 className="text-xl font-bold">MOI Receipt Entry</h1>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handlePrint}
+              className="text-white hover:bg-white/20 p-2"
+              title={language === 'ta' ? 'அச்சிடு / PDF' : 'Print / PDF'}
+            >
+              <Printer size={20} />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={toggleLanguage}
+              className="flex items-center gap-2 text-green-600 border-white/30 hover:bg-white/10 hover:text-white text-xs sm:text-sm"
+            >
+              <Languages size={16} />
+              {language === 'en' ? 'தமிழ்' : 'EN'}
+            </Button>
           </div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto p-4">
-        {/* Function Details Summary */}
+      {/* Print Options Modal */}
+      <Dialog open={showPrintModal} onOpenChange={setShowPrintModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center">
+              {language === 'ta' ? 'அச்சிடு / PDF विकल्प' : 'Print / PDF Options'}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {/* Bluetooth Printer Connection */}
+            <BluetoothPrinterConnection 
+              onPrintRequest={(fn) => setPrintFunction(() => fn)}
+            />
+            
+            {/* Print Options */}
+            <div className="grid grid-cols-1 gap-3">
+              <Button
+                onClick={handleBluetoothPrint}
+                disabled={!printFunction}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 h-12"
+              >
+                <Bluetooth className="mr-2" size={16} />
+                {language === 'ta' ? 'Bluetooth அச்சிடு' : 'Bluetooth Print'}
+              </Button>
+              
+              <Button
+                onClick={handlePDFDownload}
+                variant="outline"
+                className="h-12 border-2 border-green-300 hover:bg-green-50"
+              >
+                <Download className="mr-2" size={16} />
+                {language === 'ta' ? 'PDF डाउनलोड' : 'Download PDF'}
+              </Button>
+              
+              <Button
+                onClick={handleProceedToFullPrint}
+                variant="outline"
+                className="h-12 border-2 border-purple-300 hover:bg-purple-50"
+              >
+                <Printer className="mr-2" size={16} />
+                {language === 'ta' ? 'முழு அச்சிடல் பக்கம்' : 'Full Print Page'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Form Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* Customer Info Summary */}
         <Card className="mb-6 shadow-lg border-0">
           <CardHeader className="bg-gradient-to-r from-green-100 to-blue-100">
-            <CardTitle className="text-lg text-green-800">Function Details</CardTitle>
+            <CardTitle className="text-center text-green-800">
+              {t('customer_info_summary')}
+            </CardTitle>
           </CardHeader>
           <CardContent className="p-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="font-medium">Customer:</span> {customerData.customerName}
+                <strong>{t('customer_name')}:</strong> {customerData.customerName}
               </div>
               <div>
-                <span className="font-medium">Function:</span> {customerData.functionType}
+                <strong>{t('function_type')}:</strong> {customerData.functionType}
               </div>
               <div>
-                <span className="font-medium">Date:</span> {customerData.functionDate ? format(customerData.functionDate, "dd/MM/yyyy") : ""}
+                <strong>{t('function_date')}:</strong> {customerData.functionDate?.toLocaleDateString()}
               </div>
               <div>
-                <span className="font-medium">Venue:</span> {customerData.venuePlace}
+                <strong>{t('venue_place')}:</strong> {customerData.venuePlace}
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* MOI Entry Form */}
-          <Card className="shadow-xl border-0">
-            <CardHeader className="bg-gradient-to-r from-green-100 to-blue-100">
-              <CardTitle className="text-xl text-center text-green-800">
-                Step 2: Add MOI Receipt
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="space-y-4">
-                {/* Name */}
-                <div>
-                  <Label htmlFor="name" className="text-sm font-medium text-gray-700">
-                    Name *
-                  </Label>
-                  <Input
-                    id="name"
-                    value={currentReceipt.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
-                    className="mt-1"
-                    placeholder="Enter person's name"
-                  />
-                </div>
-
-                {/* Place */}
-                <div>
-                  <Label htmlFor="place" className="text-sm font-medium text-gray-700">
-                    Place *
-                  </Label>
-                  <Input
-                    id="place"
-                    value={currentReceipt.place}
-                    onChange={(e) => handleInputChange('place', e.target.value)}
-                    className="mt-1"
-                    placeholder="Enter place/location"
-                  />
-                </div>
-
-                {/* Relationship */}
-                <div>
-                  <Label htmlFor="relationship" className="text-sm font-medium text-gray-700">
-                    Relationship *
-                  </Label>
-                  <Input
-                    id="relationship"
-                    value={currentReceipt.relationship}
-                    onChange={(e) => handleInputChange('relationship', e.target.value)}
-                    className="mt-1"
-                    placeholder="Uncle, Friend, Colleague, etc."
-                  />
-                </div>
-
-                {/* Last Company */}
-                <div>
-                  <Label htmlFor="lastCompany" className="text-sm font-medium text-gray-700">
-                    Last Company (Optional)
-                  </Label>
-                  <Input
-                    id="lastCompany"
-                    value={currentReceipt.lastCompany}
-                    onChange={(e) => handleInputChange('lastCompany', e.target.value)}
-                    className="mt-1"
-                    placeholder="Previous company or organization"
-                  />
-                </div>
-
-                {/* MOI Amount */}
-                <div>
-                  <Label htmlFor="moiAmount" className="text-sm font-medium text-gray-700">
-                    MOI Amount (₹) *
-                  </Label>
-                  <Input
-                    id="moiAmount"
-                    type="number"
-                    value={currentReceipt.moiAmount}
-                    onChange={(e) => handleInputChange('moiAmount', e.target.value)}
-                    className="mt-1"
-                    placeholder="0"
-                  />
-                </div>
-
-                {/* Auto-filled fields (read-only) */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="functionName" className="text-sm font-medium text-gray-700">
-                      Function Name
-                    </Label>
-                    <Input
-                      id="functionName"
-                      value={currentReceipt.functionName}
-                      className="mt-1 bg-gray-100"
-                      readOnly
-                    />
+        {/* Contributors Entry */}
+        <Card className="shadow-xl border-0">
+          <CardHeader className="bg-gradient-to-r from-blue-100 to-purple-100">
+            <CardTitle className="text-xl sm:text-2xl text-center text-blue-800">
+              {t('step_2_contributors')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-6">
+            <div className="space-y-4">
+              {contributors.map((contributor, index) => (
+                <div key={index} className="p-4 border rounded-lg bg-gray-50">
+                  <div className="flex justify-between items-center mb-3">
+                    <h4 className="font-semibold text-gray-700">
+                      {t('contributor')} {index + 1}
+                    </h4>
+                    {contributors.length > 1 && (
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => removeContributor(index)}
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+                    )}
                   </div>
-                  <div>
-                    <Label htmlFor="functionDateDisplay" className="text-sm font-medium text-gray-700">
-                      Function Date
-                    </Label>
-                    <Input
-                      id="functionDateDisplay"
-                      value={currentReceipt.functionDate}
-                      className="mt-1 bg-gray-100"
-                      readOnly
-                    />
-                  </div>
-                </div>
-
-                {/* Add Receipt Button */}
-                <Button
-                  onClick={handleAddReceipt}
-                  className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white"
-                >
-                  <Plus className="mr-2" size={20} />
-                  Add Receipt
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Receipts List */}
-          <Card className="shadow-xl border-0">
-            <CardHeader className="bg-gradient-to-r from-blue-100 to-purple-100">
-              <CardTitle className="text-xl text-center text-blue-800">
-                Added Receipts ({receipts.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              {receipts.length > 0 ? (
-                <div className="space-y-4 max-h-96 overflow-y-auto">
-                  {receipts.map((receipt, index) => (
-                    <Card key={index} className="bg-gray-50 border border-gray-200">
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-gray-800">{receipt.name}</h4>
-                            <p className="text-sm text-gray-600">{receipt.place} • {receipt.relationship}</p>
-                            {receipt.lastCompany && (
-                              <p className="text-sm text-gray-500">{receipt.lastCompany}</p>
-                            )}
-                          </div>
-                          <div className="text-right">
-                            <p className="font-bold text-lg text-green-600">₹{receipt.moiAmount}</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
                   
-                  {/* Total Amount */}
-                  <Card className="bg-gradient-to-r from-green-500 to-blue-600 text-white">
-                    <CardContent className="p-4">
-                      <div className="flex justify-between items-center">
-                        <span className="text-lg font-semibold">Total Amount:</span>
-                        <span className="text-2xl font-bold">₹{totalAmount}</span>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <Label htmlFor={`name-${index}`} className="text-sm font-medium text-gray-700">
+                        {t('contributor_name')} *
+                      </Label>
+                      <Input
+                        id={`name-${index}`}
+                        value={contributor.name}
+                        onChange={(e) => updateContributor(index, 'name', e.target.value)}
+                        placeholder={t('enter_contributor_name')}
+                        className="mt-1"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor={`amount-${index}`} className="text-sm font-medium text-gray-700">
+                        {t('amount')} (₹) *
+                      </Label>
+                      <Input
+                        id={`amount-${index}`}
+                        type="number"
+                        value={contributor.amount}
+                        onChange={(e) => updateContributor(index, 'amount', e.target.value)}
+                        placeholder="0"
+                        className="mt-1"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor={`payment-${index}`} className="text-sm font-medium text-gray-700">
+                        {t('payment_mode')} *
+                      </Label>
+                      <select
+                        id={`payment-${index}`}
+                        value={contributor.paymentMode}
+                        onChange={(e) => updateContributor(index, 'paymentMode', e.target.value)}
+                        className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="cash">{t('cash')}</option>
+                        <option value="card">{t('card')}</option>
+                        <option value="upi">{t('upi')}</option>
+                        <option value="cheque">{t('cheque')}</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
-              ) : (
-                <div className="text-center py-8">
-                  <Receipt size={48} className="mx-auto text-gray-400 mb-4" />
-                  <p className="text-gray-600">No receipts added yet</p>
-                  <p className="text-sm text-gray-500">Add your first MOI receipt using the form</p>
-                </div>
-              )}
+              ))}
+            </div>
 
-              {/* Save All Button */}
-              {receipts.length > 0 && (
-                <Button
-                  onClick={handleSaveAll}
-                  className="w-full mt-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-                >
-                  <Save className="mr-2" size={20} />
-                  Save All Receipts
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+            {/* Add Contributor Button */}
+            <div className="mt-6 text-center">
+              <Button
+                onClick={addContributor}
+                variant="outline"
+                className="border-dashed border-2 border-blue-300 hover:border-blue-500 hover:bg-blue-50"
+              >
+                <Plus className="mr-2" size={20} />
+                {t('add_contributor')}
+              </Button>
+            </div>
+
+            {/* Total Amount Display */}
+            {contributors.some(c => c.amount) && (
+              <div className="mt-6 p-4 bg-green-50 rounded-lg border-2 border-green-200">
+                <div className="text-center">
+                  <span className="text-lg font-semibold text-green-800">
+                    {t('total_amount')}: ₹{contributors.reduce((sum, c) => sum + (parseFloat(c.amount) || 0), 0).toLocaleString('en-IN')}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-end mt-8">
+              <Button
+                onClick={handlePrint}
+                variant="outline"
+                className="border-2 border-blue-300 hover:bg-blue-50 px-6 py-2"
+              >
+                <Printer className="mr-2" size={20} />
+                {t('print_receipts')}
+              </Button>
+              
+              <Button
+                onClick={handleProceedToFullPrint}
+                className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-6 py-2"
+              >
+                {t('proceed_to_print')}
+                <ArrowRight className="ml-2" size={20} />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
