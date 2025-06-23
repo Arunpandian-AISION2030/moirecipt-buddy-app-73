@@ -28,16 +28,16 @@ const AddReceiptModal = ({ open, onOpenChange }: AddReceiptModalProps) => {
 
   const handleCapture = () => {
     toast({
-      title: "Camera feature",
-      description: "Camera functionality would be implemented here",
+      title: t('camera_feature'),
+      description: t('camera_functionality_desc'),
     });
     onOpenChange(false);
   };
 
   const handleUpload = () => {
     toast({
-      title: "Upload feature", 
-      description: "File upload functionality would be implemented here",
+      title: t('upload_feature'), 
+      description: t('upload_functionality_desc'),
     });
     onOpenChange(false);
   };
@@ -45,8 +45,8 @@ const AddReceiptModal = ({ open, onOpenChange }: AddReceiptModalProps) => {
   const handleCategorySelect = (category: string) => {
     setSelectedCategory(category);
     toast({
-      title: "Category selected",
-      description: `Receipt will be categorized as ${categories.find(c => c.value === category)?.label}`,
+      title: t('category_selected'),
+      description: `${t('receipt_categorized')} ${categories.find(c => c.value === category)?.label}`,
     });
   };
 
@@ -54,39 +54,39 @@ const AddReceiptModal = ({ open, onOpenChange }: AddReceiptModalProps) => {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md bg-gradient-to-br from-blue-50 to-purple-50 border-0">
         <DialogHeader>
-          <DialogTitle className="text-center text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <DialogTitle className="text-center text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             {t('add_receipt')}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-4 sm:space-y-6 py-4">
           {/* Upload method selection */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-gray-800 text-center">Choose upload method</h3>
+          <div className="space-y-3 sm:space-y-4">
+            <h3 className="font-semibold text-gray-800 text-center text-sm sm:text-base">{t('choose_upload_method')}</h3>
             <div className="grid grid-cols-1 gap-3">
               <Button
                 onClick={handleCapture}
                 size="lg"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white h-14 text-lg font-semibold shadow-lg transform hover:scale-105 transition-all duration-200"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white h-12 sm:h-14 text-base sm:text-lg font-semibold shadow-lg transform hover:scale-105 transition-all duration-200"
               >
-                <Camera className="mr-3" size={24} />
+                <Camera className="mr-2 sm:mr-3" size={20} />
                 {t('snap_now')}
               </Button>
               <Button
                 onClick={handleUpload}
                 variant="outline"
                 size="lg" 
-                className="h-14 text-lg font-semibold border-2 border-purple-300 hover:border-purple-500 hover:bg-purple-50 transform hover:scale-105 transition-all duration-200"
+                className="h-12 sm:h-14 text-base sm:text-lg font-semibold border-2 border-purple-300 hover:border-purple-500 hover:bg-purple-50 transform hover:scale-105 transition-all duration-200"
               >
-                <Upload className="mr-3" size={24} />
+                <Upload className="mr-2 sm:mr-3" size={20} />
                 {t('upload')}
               </Button>
             </div>
           </div>
 
           {/* Category selection */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-gray-800 text-center">Select category</h3>
+          <div className="space-y-3 sm:space-y-4">
+            <h3 className="font-semibold text-gray-800 text-center text-sm sm:text-base">{t('select_category')}</h3>
             <div className="grid grid-cols-2 gap-3">
               {categories.map((category) => {
                 const IconComponent = category.icon;
@@ -98,11 +98,11 @@ const AddReceiptModal = ({ open, onOpenChange }: AddReceiptModalProps) => {
                     }`}
                     onClick={() => handleCategorySelect(category.value)}
                   >
-                    <CardContent className="p-4 text-center">
-                      <div className={`w-12 h-12 bg-gradient-to-r ${category.color} rounded-full flex items-center justify-center mx-auto mb-2`}>
-                        <IconComponent size={24} className="text-white" />
+                    <CardContent className="p-3 sm:p-4 text-center">
+                      <div className={`w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r ${category.color} rounded-full flex items-center justify-center mx-auto mb-2`}>
+                        <IconComponent size={20} className="text-white sm:w-6 sm:h-6" />
                       </div>
-                      <p className="font-medium text-gray-800 text-sm">{category.label}</p>
+                      <p className="font-medium text-gray-800 text-xs sm:text-sm">{category.label}</p>
                     </CardContent>
                   </Card>
                 );
@@ -112,10 +112,10 @@ const AddReceiptModal = ({ open, onOpenChange }: AddReceiptModalProps) => {
 
           {/* Alternative: Dropdown for categories */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Or select from dropdown:</label>
+            <label className="text-xs sm:text-sm font-medium text-gray-700">{t('dropdown_select')}</label>
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Choose category..." />
+                <SelectValue placeholder={t('choose_category')} />
               </SelectTrigger>
               <SelectContent>
                 {categories.map((category) => (

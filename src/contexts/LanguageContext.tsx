@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, ReactNode } from 'react';
 
 type Language = 'en' | 'ta';
@@ -147,6 +146,34 @@ const translations = {
     traditional_bill_description: "Create comprehensive event bills",
     step_process: "Step 1: Customer & Function → Step 2: MOI Receipts",
     single_form: "Single form with all billing details",
+    
+    // Additional translations for CustomerFunctionEntry
+    validation_error: "Validation Error",
+    customer_name: "Customer Name",
+    enter_customer_name: "Enter customer name",
+    mobile_number: "Mobile Number", 
+    mobile_placeholder: "10 digit mobile number",
+    select_function_type: "Select function type",
+    puberty: "Puberty",
+    engagement: "Engagement", 
+    housewarming: "Housewarming",
+    pick_date: "Pick a date",
+    venue_place: "Venue / Place",
+    enter_venue_address: "Enter venue name and address",
+    next_step: "Next Step",
+    step_1_customer_function: "Step 1: Customer & Function Details",
+    
+    // Additional translations for AddReceiptModal
+    camera_feature: "Camera feature",
+    camera_functionality_desc: "Camera functionality would be implemented here",
+    upload_feature: "Upload feature",
+    upload_functionality_desc: "File upload functionality would be implemented here", 
+    category_selected: "Category selected",
+    receipt_categorized: "Receipt will be categorized as",
+    choose_upload_method: "Choose upload method",
+    select_category: "Select category", 
+    dropdown_select: "Or select from dropdown:",
+    choose_category: "Choose category...",
   },
   ta: {
     // Splash Screen  
@@ -285,6 +312,34 @@ const translations = {
     traditional_bill_description: "விரிவான நிகழ்ச்சி பில்களை உருவாக்கவும்",
     step_process: "படி 1: வாடிக்கையாளர் & நிகழ்ச்சி → படி 2: MOI ரசீதுகள்",
     single_form: "அனைத்து பில்லிங் விவரங்களுடன் ஒற்றை படிவம்",
+    
+    // Additional translations for CustomerFunctionEntry
+    validation_error: "சரிபார்ப்பு பிழை",
+    customer_name: "வாடிக்கையாளர் பெயர்",
+    enter_customer_name: "வாடிக்கையாளர் பெயரை உள்ளிடவும்",
+    mobile_number: "மொபைல் எண்",
+    mobile_placeholder: "10 இலக்க மொபைல் எண்",
+    select_function_type: "நிகழ்ச்சி வகையை தேர்ந்தெடுக்கவும்",
+    puberty: "பூப்புனித விழா",
+    engagement: "நிச்சயதார்த்தம்",
+    housewarming: "கிரகப்பிரவேசம்",
+    pick_date: "தேதியை தேர்ந்தெடுக்கவும்",
+    venue_place: "இடம் / அரங்கம்",
+    enter_venue_address: "அரங்கத்தின் பெயர் மற்றும் முகவரியை உள்ளிடவும்",
+    next_step: "அடுத்த படி",
+    step_1_customer_function: "படி 1: வாடிக்கையாளர் & நிகழ்ச்சி விவரங்கள்",
+    
+    // Additional translations for AddReceiptModal
+    camera_feature: "கேமரா அம்சம்",
+    camera_functionality_desc: "கேமரா செயல்பாடு இங்கே செயல்படுத்தப்படும்",
+    upload_feature: "பதிவேற்று அம்சம்",
+    upload_functionality_desc: "கோப்பு பதிவேற்று செயல்பாடு இங்கே செயல்படுத்தப்படும்",
+    category_selected: "வகை தேர்ந்தெடுக்கப்பட்டது",
+    receipt_categorized: "ரசீது இவ்வாறு வகைப்படுத்தப்படும்",
+    choose_upload_method: "பதிவேற்று முறையை தேர்ந்தெடுக்கவும்",
+    select_category: "வகையை தேர்ந்தெடுக்கவும்",
+    dropdown_select: "அல்லது கீழ்விழுப்பட்டியலில் இருந்து தேர்ந்தெடுக்கவும்:",
+    choose_category: "வகையை தேர்ந்தெடுக்கவும்...",
   }
 };
 
