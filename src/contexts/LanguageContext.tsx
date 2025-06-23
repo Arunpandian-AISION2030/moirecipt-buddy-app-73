@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, ReactNode } from 'react';
 
 type Language = 'en' | 'ta';
@@ -146,6 +147,18 @@ const translations = {
     traditional_bill_description: "Create comprehensive event bills",
     step_process: "Step 1: Customer & Function → Step 2: MOI Receipts",
     single_form: "Single form with all billing details",
+    
+    // Updated labels
+    client_function_organizer: "Client / Function Organizer",
+    relations_guest: "Relations/Guest",
+    contributor: "Relation/Guest",
+    contributor_name: "Relation/Guest Name",
+    enter_contributor_name: "Enter relation/guest name",
+    add_contributor: "Add Relation/Guest",
+    step_2_contributors: "Step 2: Relations/Guest",
+    print_receipts: "Print Receipts",
+    proceed_to_print: "Proceed to Print",
+    amount: "Amount",
     
     // Additional translations for CustomerFunctionEntry
     validation_error: "Validation Error",
@@ -312,6 +325,18 @@ const translations = {
     traditional_bill_description: "விரிவான நிகழ்ச்சி பில்களை உருவாக்கவும்",
     step_process: "படி 1: வாடிக்கையாளர் & நிகழ்ச்சி → படி 2: MOI ரசீதுகள்",
     single_form: "அனைத்து பில்லிங் விவரங்களுடன் ஒற்றை படிவம்",
+    
+    // Updated labels
+    client_function_organizer: "வாடிக்கையாளர் / நிகழ்ச்சி ஏற்பாட்டாளர்",
+    relations_guest: "உறவினர்/விருந்தினர்",
+    contributor: "உறவினர்/விருந்தினர்",
+    contributor_name: "உறவினர்/விருந்தினர் பெயர்",
+    enter_contributor_name: "உறவினர்/விருந்தினர் பெயரை உள்ளிடவும்",
+    add_contributor: "உறவினர்/விருந்தினர் சேர்க்கவும்",
+    step_2_contributors: "படி 2: உறவினர்/விருந்தினர்",
+    print_receipts: "ரசீதுகள் அச்சிடு",
+    proceed_to_print: "அச்சிடல் தொடரவும்",
+    amount: "தொகை",
     
     // Additional translations for CustomerFunctionEntry
     validation_error: "சரிபார்ப்பு பிழை",

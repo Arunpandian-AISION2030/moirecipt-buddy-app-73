@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -322,11 +323,11 @@ Generated: ${new Date().toLocaleString()}
 
       {/* Form Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        {/* Customer Info Summary */}
+        {/* Client Info Summary */}
         <Card className="mb-6 shadow-lg border-0">
           <CardHeader className="bg-gradient-to-r from-green-100 to-blue-100">
             <CardTitle className="text-center text-green-800">
-              {t('customer_info_summary')}
+              {t('client_function_organizer')}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4">
@@ -351,7 +352,7 @@ Generated: ${new Date().toLocaleString()}
         <Card className="shadow-xl border-0">
           <CardHeader className="bg-gradient-to-r from-blue-100 to-purple-100">
             <CardTitle className="text-xl sm:text-2xl text-center text-blue-800">
-              {t('step_2_contributors')}
+              {t('relations_guest')}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 sm:p-6">
