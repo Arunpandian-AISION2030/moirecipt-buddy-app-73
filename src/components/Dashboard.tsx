@@ -1,13 +1,15 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Camera, Upload, Plus, TrendingUp, Receipt, Languages, PartyPopper, FileText, Home, Settings } from "lucide-react";
+import { Camera, Upload, Plus, TrendingUp, Receipt, Languages, PartyPopper, FileText, Home } from "lucide-react";
 import AddReceiptModal from "./AddReceiptModal";
 
 const Dashboard = () => {
   const { t, toggleLanguage, language } = useLanguage();
+  const navigate = useNavigate();
   const [showAddReceipt, setShowAddReceipt] = useState(false);
 
   // Mock data for demonstration
@@ -20,11 +22,10 @@ const Dashboard = () => {
   const monthlyTotal = "₹2,340";
 
   const handleNavigateToBills = () => {
-    window.location.href = '/bills';
+    navigate('/bills');
   };
 
   const handleNavigateToReceipts = () => {
-    // Navigate to receipts page (current dashboard functionality)
     console.log('Already on receipts page');
   };
 
@@ -71,7 +72,7 @@ const Dashboard = () => {
           >
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-                <Receipt size={20} className="sm:size-6" />
+                <Receipt size={20} className="sm:w-6 sm:h-6" />
                 {t('receipts_menu')}
               </CardTitle>
             </CardHeader>
@@ -87,7 +88,7 @@ const Dashboard = () => {
           >
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-                <PartyPopper size={20} className="sm:size-6" />
+                <PartyPopper size={20} className="sm:w-6 sm:h-6" />
                 {t('bills_menu')}
               </CardTitle>
             </CardHeader>
@@ -103,7 +104,7 @@ const Dashboard = () => {
           <Card className="bg-gradient-to-r from-green-500 to-blue-600 text-white border-0 shadow-xl">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                <TrendingUp size={20} className="sm:size-6" />
+                <TrendingUp size={20} className="sm:w-6 sm:h-6" />
                 {t('monthly_summary')}
               </CardTitle>
             </CardHeader>
@@ -116,7 +117,7 @@ const Dashboard = () => {
           <Card className="bg-gradient-to-r from-purple-500 to-pink-600 text-white border-0 shadow-xl">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                <FileText size={20} className="sm:size-6" />
+                <FileText size={20} className="sm:w-6 sm:h-6" />
                 {t('recent_activity')}
               </CardTitle>
             </CardHeader>
@@ -176,7 +177,7 @@ const Dashboard = () => {
             <Card className="text-center py-8 sm:py-12">
               <CardContent>
                 <div className="mb-4">
-                  <Receipt size={48} className="sm:size-16 mx-auto text-gray-400" />
+                  <Receipt size={48} className="sm:w-16 sm:h-16 mx-auto text-gray-400" />
                 </div>
                 <p className="text-gray-600 text-base sm:text-lg mb-4">{t('no_receipts')}</p>
                 <Button

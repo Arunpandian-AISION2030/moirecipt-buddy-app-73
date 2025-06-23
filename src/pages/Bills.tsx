@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import BillEntryForm from "@/components/BillEntryForm";
 import BillSummary from "@/components/BillSummary";
 import CustomerFunctionEntry, { CustomerFunctionData } from "@/components/CustomerFunctionEntry";
@@ -27,6 +28,7 @@ type ViewType = 'menu' | 'customer-function' | 'moi-receipt' | 'form' | 'summary
 
 const Bills = () => {
   const { t, toggleLanguage, language } = useLanguage();
+  const navigate = useNavigate();
   const [currentView, setCurrentView] = useState<ViewType>('menu');
   const [currentBillData, setCurrentBillData] = useState<BillData | null>(null);
   const [customerFunctionData, setCustomerFunctionData] = useState<CustomerFunctionData | null>(null);
@@ -41,7 +43,7 @@ const Bills = () => {
   };
 
   const handleBackToDashboard = () => {
-    window.history.back();
+    navigate('/');
   };
 
   const handleBackToMenu = () => {
@@ -102,7 +104,7 @@ const Bills = () => {
             >
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-                  <Receipt size={20} className="sm:size-6" />
+                  <Receipt size={20} className="sm:w-6 sm:h-6" />
                   {t('moi_receipt_entry')}
                 </CardTitle>
               </CardHeader>
@@ -124,7 +126,7 @@ const Bills = () => {
             >
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-                  <FileText size={20} className="sm:size-6" />
+                  <FileText size={20} className="sm:w-6 sm:h-6" />
                   {t('traditional_bill')}
                 </CardTitle>
               </CardHeader>
