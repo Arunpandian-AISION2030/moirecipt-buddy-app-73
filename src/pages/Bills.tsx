@@ -13,7 +13,7 @@ import { saveFullEntry } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import MobileHeader from "@/components/MobileHeader";
 import MobileCard from "@/components/MobileCard";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface BillData {
   clientName: string;
