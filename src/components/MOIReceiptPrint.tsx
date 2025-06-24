@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -13,7 +14,6 @@ interface MOIReceiptData {
   functionDate: string;
   contributorName: string;
   contributorPlace: string;
-  relationship: string;
   amount: string;
   paymentMode: string;
   timestamp: string;
