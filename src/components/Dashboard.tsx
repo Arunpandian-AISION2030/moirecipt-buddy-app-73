@@ -1,16 +1,21 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Camera, Upload, Plus, TrendingUp, Receipt, Languages, PartyPopper, FileText, Home, LogOut } from "lucide-react";
 import AddReceiptModal from "./AddReceiptModal";
+import MobileHeader from "./MobileHeader";
+import MobileCard from "./MobileCard";
 
 const Dashboard = () => {
   const { t, toggleLanguage, language } = useLanguage();
   const { logout, user } = useAuth();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [showAddReceipt, setShowAddReceipt] = useState(false);
 
   // Mock data for demonstration
@@ -35,6 +40,150 @@ const Dashboard = () => {
     navigate('/login');
   };
 
+  if (isMobile) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-green-50">
+        <MobileHeader 
+          title="MOIRECIPT" 
+          showMenu={true}
+        />
+
+        <div className="p-4 space-y-6">
+          {/* Welcome section */}
+          <div className="text-center py-4">
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">
+              {t('dashboard_title')}
+            </h2>
+            <p className="text-sm text-gray-600">{t('dashboard_subtitle')}</p>
+          </div>
+
+          {/* Main Navigation Cards */}
+          <div className="space-y-4">
+            <MobileCard
+              title={t('receipts_menu')}
+              icon={<Receipt size={24} />}
+              description={t('receipts_description')}
+              onClick={handleNavigateToReceipts}
+              gradient="bg-gradient-to-r from-blue-500 to-purple-600"
+            >
+              <div className="text-blue-100 text-sm">{t('receipts_subtitle')}</div>
+            </MobileCard>
+
+            <MobileCard
+              title={t('bills_menu')}
+              icon={<PartyPopper size={24} />}
+              description={t('bills_description')}
+              onClick={handleNavigateToBills}
+              gradient="bg-gradient-to-r from-orange-500 to-red-600"
+            >
+              <div className="text-orange-100 text-sm">{t('bills_subtitle')}</div>
+            </MobileCard>
+          </div>
+
+          {/* Quick stats */}
+          <div className="grid grid-cols-1 gap-4">
+            <Card className="bg-gradient-to-r from-green-500 to-blue-600 text-white border-0 shadow-lg">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-3 text-lg">
+                  <TrendingUp size={20} />
+                  {t('monthly_summary')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold mb-1">{monthlyTotal}</div>
+                <div className="text-green-100 text-sm">{t('this_month')}</div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-r from-purple-500 to-pink-600 text-white border-0 shadow-lg">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-3 text-lg">
+                  <FileText size={20} />
+                  {t('recent_activity')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold mb-1">{recentReceipts.length}</div>
+                <div className="text-purple-100 text-sm">{t('items_this_week')}</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Quick actions for receipts */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-800">{t('add_receipt')}</h3>
+            <div className="space-y-3">
+              <Button
+                onClick={() => setShowAddReceipt(true)}
+                size="lg"
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white h-14 text-lg font-semibold shadow-lg active:scale-95 transition-all duration-200"
+              >
+                <Camera className="mr-3" size={24} />
+                {t('snap_now')}
+              </Button>
+              <Button
+                onClick={() => setShowAddReceipt(true)}
+                variant="outline"
+                size="lg"
+                className="w-full h-14 text-lg font-semibold border-2 border-purple-300 hover:border-purple-500 hover:bg-purple-50 active:scale-95 transition-all duration-200"
+              >
+                <Upload className="mr-3" size={24} />
+                {t('upload')}
+              </Button>
+            </div>
+          </div>
+
+          {/* Recent receipts */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-800">{t('recent_receipts')}</h3>
+            {recentReceipts.length > 0 ? (
+              <div className="space-y-3">
+                {recentReceipts.map((receipt) => (
+                  <Card key={receipt.id} className="shadow-md active:scale-95 transition-all duration-200">
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-center">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-gray-800 text-base truncate">{receipt.store}</h4>
+                          <p className="text-sm text-gray-600 truncate">{receipt.category} • {receipt.date}</p>
+                        </div>
+                        <div className="text-right ml-4">
+                          <p className="font-bold text-lg text-gray-800">{receipt.amount}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <Card className="text-center py-8">
+                <CardContent>
+                  <div className="mb-4">
+                    <Receipt size={48} className="mx-auto text-gray-400" />
+                  </div>
+                  <p className="text-gray-600 text-base mb-4">{t('no_receipts')}</p>
+                  <Button
+                    onClick={() => setShowAddReceipt(true)}
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                  >
+                    <Plus className="mr-2" size={20} />
+                    {t('add_receipt')}
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </div>
+
+        {/* Add Receipt Modal */}
+        <AddReceiptModal 
+          open={showAddReceipt} 
+          onOpenChange={setShowAddReceipt} 
+        />
+      </div>
+    );
+  }
+
+  // Desktop version
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-green-50">
       {/* Header - Responsive */}

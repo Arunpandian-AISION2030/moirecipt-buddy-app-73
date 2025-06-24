@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BillEntryForm from "@/components/BillEntryForm";
@@ -5,11 +6,14 @@ import BillSummary from "@/components/BillSummary";
 import CustomerFunctionEntry, { CustomerFunctionData } from "@/components/CustomerFunctionEntry";
 import MOIReceiptEntry from "@/components/MOIReceiptEntry";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Languages, FileText, Receipt, Database } from "lucide-react";
 import { saveFullEntry } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
+import MobileHeader from "@/components/MobileHeader";
+import MobileCard from "@/components/MobileCard";
 
 interface BillData {
   clientName: string;
@@ -31,6 +35,7 @@ const Bills = () => {
   const { t, toggleLanguage, language } = useLanguage();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [currentView, setCurrentView] = useState<ViewType>('menu');
   const [currentBillData, setCurrentBillData] = useState<BillData | null>(null);
   const [customerFunctionData, setCustomerFunctionData] = useState<CustomerFunctionData | null>(null);
@@ -88,6 +93,68 @@ const Bills = () => {
 
   // Menu View
   if (currentView === 'menu') {
+    if (isMobile) {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50">
+          <MobileHeader 
+            title={t('bills_menu')} 
+            onBack={handleBackToDashboard}
+            showBackButton={true}
+          />
+
+          <div className="p-4 space-y-6">
+            <div className="text-center py-4">
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('choose_bill_type')}</h2>
+              <p className="text-sm text-gray-600">{t('choose_bill_type')}</p>
+            </div>
+
+            <div className="space-y-4">
+              <MobileCard
+                title={t('moi_receipt_entry')}
+                icon={<Receipt size={24} />}
+                description={t('moi_receipt_description')}
+                onClick={() => setCurrentView('customer-function')}
+                gradient="bg-gradient-to-r from-green-500 to-blue-600"
+              >
+                <div className="flex items-center justify-center mt-4">
+                  <div className="text-4xl">🧾</div>
+                </div>
+                <div className="text-green-200 text-sm text-center">
+                  {t('step_process')}
+                </div>
+              </MobileCard>
+
+              <MobileCard
+                title={t('traditional_bill')}
+                icon={<FileText size={24} />}
+                description={t('traditional_bill_description')}
+                onClick={() => setCurrentView('form')}
+                gradient="bg-gradient-to-r from-orange-500 to-red-600"
+              >
+                <div className="flex items-center justify-center mt-4">
+                  <div className="text-4xl">📋</div>
+                </div>
+                <div className="text-orange-200 text-sm text-center">
+                  {t('single_form')}
+                </div>
+              </MobileCard>
+            </div>
+
+            <div className="pt-4">
+              <Button
+                onClick={handleSaveFullEntry}
+                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white py-4 rounded-lg shadow-lg active:scale-95 transition-all duration-200"
+              >
+                <Database className="mr-3" size={20} />
+                Test Supabase Connection
+              </Button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Desktop version
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50">
         {/* Header - Responsive */}
