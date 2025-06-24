@@ -1,10 +1,11 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { ArrowLeft, ArrowRight, Languages, Plus, Trash2, Printer, Download, Bluetooth } from "lucide-react";
+import { ArrowLeft, ArrowRight, Languages, Plus, Printer, Download, Bluetooth, Edit, Save, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { CustomerFunctionData } from "./CustomerFunctionEntry";
 import MOIReceiptPrint from "./MOIReceiptPrint";
@@ -28,6 +29,7 @@ interface ContributorEntry {
   nativePlace: string;
   amount: string;
   paymentMode: string;
+  isEditing?: boolean;
 }
 
 interface MOIReceiptEntryProps {
@@ -40,7 +42,7 @@ const MOIReceiptEntry = ({ onBack, customerData }: MOIReceiptEntryProps) => {
   const { toast } = useToast();
   
   const [contributors, setContributors] = useState<ContributorEntry[]>([
-    { name: "", nativePlace: "", amount: "", paymentMode: "cash" }
+    { name: "", nativePlace: "", amount: "", paymentMode: "cash", isEditing: true }
   ]);
   
   const [showPrintView, setShowPrintView] = useState(false);
@@ -71,20 +73,56 @@ const MOIReceiptEntry = ({ onBack, customerData }: MOIReceiptEntryProps) => {
   };
 
   const addContributor = () => {
-    setContributors([...contributors, { name: "", nativePlace: "", amount: "", paymentMode: "cash" }]);
+    setContributors([...contributors, { name: "", nativePlace: "", amount: "", paymentMode: "cash", isEditing: true }]);
   };
 
-  const removeContributor = (index: number) => {
-    if (contributors.length > 1) {
-      setContributors(contributors.filter((_, i) => i !== index));
-    }
-  };
-
-  const updateContributor = (index: number, field: keyof ContributorEntry, value: string) => {
+  const updateContributor = (index: number, field: keyof ContributorEntry, value: string | boolean) => {
     const updated = contributors.map((contributor, i) => 
       i === index ? { ...contributor, [field]: value } : contributor
     );
     setContributors(updated);
+  };
+
+  const toggleEditMode = (index: number) => {
+    const updated = contributors.map((contributor, i) => 
+      i === index ? { ...contributor, isEditing: !contributor.isEditing } : contributor
+    );
+    setContributors(updated);
+  };
+
+  const saveContributor = (index: number) => {
+    const contributor = contributors[index];
+    
+    if (!contributor.name.trim() || !contributor.amount.trim()) {
+      toast({
+        title: t('validation_error'),
+        description: t('required_field'),
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (isNaN(Number(contributor.amount)) || Number(contributor.amount) <= 0) {
+      toast({
+        title: t('validation_error'),
+        description: t('invalid_amount'),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    updateContributor(index, 'isEditing', false);
+    
+    toast({
+      title: language === 'ta' ? "சேமிக்கப்பட்டது!" : "Saved!",
+      description: language === 'ta' ? 
+        "பங்களிப்பாளர் தகவல் சேமிக்கப்பட்டது" : 
+        "Contributor information saved successfully",
+    });
+  };
+
+  const cancelEdit = (index: number) => {
+    updateContributor(index, 'isEditing', false);
   };
 
   const validateForm = () => {
@@ -446,15 +484,37 @@ Generated: ${new Date().toLocaleString()}
                     <h4 className="font-semibold text-gray-700">
                       {t('contributor')} {index + 1}
                     </h4>
-                    {contributors.length > 1 && (
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => removeContributor(index)}
-                      >
-                        <Trash2 size={16} />
-                      </Button>
-                    )}
+                    <div className="flex gap-2">
+                      {contributor.isEditing ? (
+                        <>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => saveContributor(index)}
+                            className="text-green-600 border-green-300 hover:bg-green-50"
+                          >
+                            <Save size={16} />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => cancelEdit(index)}
+                            className="text-gray-600 border-gray-300 hover:bg-gray-50"
+                          >
+                            <X size={16} />
+                          </Button>
+                        </>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => toggleEditMode(index)}
+                          className="text-blue-600 border-blue-300 hover:bg-blue-50"
+                        >
+                          <Edit size={16} />
+                        </Button>
+                      )}
+                    </div>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -468,6 +528,8 @@ Generated: ${new Date().toLocaleString()}
                         onChange={(e) => updateContributor(index, 'name', e.target.value)}
                         placeholder={t('enter_contributor_name')}
                         className="mt-1"
+                        readOnly={!contributor.isEditing}
+                        disabled={!contributor.isEditing}
                       />
                     </div>
                     
@@ -481,6 +543,8 @@ Generated: ${new Date().toLocaleString()}
                         onChange={(e) => updateContributor(index, 'nativePlace', e.target.value)}
                         placeholder="Enter place"
                         className="mt-1"
+                        readOnly={!contributor.isEditing}
+                        disabled={!contributor.isEditing}
                       />
                     </div>
                     
@@ -495,6 +559,8 @@ Generated: ${new Date().toLocaleString()}
                         onChange={(e) => updateContributor(index, 'amount', e.target.value)}
                         placeholder="0"
                         className="mt-1"
+                        readOnly={!contributor.isEditing}
+                        disabled={!contributor.isEditing}
                       />
                     </div>
                     
@@ -506,7 +572,10 @@ Generated: ${new Date().toLocaleString()}
                         id={`payment-${index}`}
                         value={contributor.paymentMode}
                         onChange={(e) => updateContributor(index, 'paymentMode', e.target.value)}
-                        className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className={`mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                          !contributor.isEditing ? 'bg-gray-100 cursor-not-allowed' : ''
+                        }`}
+                        disabled={!contributor.isEditing}
                       >
                         <option value="cash">{t('cash')}</option>
                         <option value="card">{t('card')}</option>
