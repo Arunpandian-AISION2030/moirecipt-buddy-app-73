@@ -18,7 +18,6 @@ interface MOIReceiptData {
   functionDate: string;
   contributorName: string;
   contributorPlace: string;
-  relationship: string;
   amount: string;
   paymentMode: string;
   timestamp: string;
@@ -27,7 +26,6 @@ interface MOIReceiptData {
 interface ContributorEntry {
   name: string;
   nativePlace: string;
-  relationship: string;
   amount: string;
   paymentMode: string;
 }
@@ -42,7 +40,7 @@ const MOIReceiptEntry = ({ onBack, customerData }: MOIReceiptEntryProps) => {
   const { toast } = useToast();
   
   const [contributors, setContributors] = useState<ContributorEntry[]>([
-    { name: "", nativePlace: "", relationship: "", amount: "", paymentMode: "cash" }
+    { name: "", nativePlace: "", amount: "", paymentMode: "cash" }
   ]);
   
   const [showPrintView, setShowPrintView] = useState(false);
@@ -73,7 +71,7 @@ const MOIReceiptEntry = ({ onBack, customerData }: MOIReceiptEntryProps) => {
   };
 
   const addContributor = () => {
-    setContributors([...contributors, { name: "", nativePlace: "", relationship: "", amount: "", paymentMode: "cash" }]);
+    setContributors([...contributors, { name: "", nativePlace: "", amount: "", paymentMode: "cash" }]);
   };
 
   const removeContributor = (index: number) => {
@@ -126,7 +124,6 @@ const MOIReceiptEntry = ({ onBack, customerData }: MOIReceiptEntryProps) => {
       functionDate: customerData.functionDate?.toLocaleDateString() || '',
       contributorName: contributor.name,
       contributorPlace: contributor.nativePlace,
-      relationship: contributor.relationship,
       amount: contributor.amount,
       paymentMode: contributor.paymentMode,
       timestamp: new Date().toISOString(),
@@ -364,7 +361,7 @@ Generated: ${new Date().toLocaleString()}
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-center">
-              {language === 'ta' ? 'அச்சிடு / PDF விகল்ப' : 'Print / PDF Options'}
+              {language === 'ta' ? 'அச்சிடு / PDF விகல்ப' : 'Print / PDF Options'}
             </DialogTitle>
           </DialogHeader>
           
@@ -483,19 +480,6 @@ Generated: ${new Date().toLocaleString()}
                         value={contributor.nativePlace}
                         onChange={(e) => updateContributor(index, 'nativePlace', e.target.value)}
                         placeholder="Enter place"
-                        className="mt-1"
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor={`relationship-${index}`} className="text-sm font-medium text-gray-700">
-                        Relationship
-                      </Label>
-                      <Input
-                        id={`relationship-${index}`}
-                        value={contributor.relationship}
-                        onChange={(e) => updateContributor(index, 'relationship', e.target.value)}
-                        placeholder="Uncle, Friend, etc."
                         className="mt-1"
                       />
                     </div>
