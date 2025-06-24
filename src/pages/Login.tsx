@@ -7,12 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, Languages } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const Login = () => {
   const { login, signUp, isAuthenticated } = useAuth();
-  const { t } = useLanguage();
+  const { t, language, toggleLanguage } = useLanguage();
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -32,8 +32,8 @@ const Login = () => {
     
     if (!email.trim() || !password.trim()) {
       toast({
-        title: "Error",
-        description: "Please enter both email and password",
+        title: t('validation_error'),
+        description: t('required_field'),
         variant: "destructive",
       });
       return;
@@ -47,21 +47,21 @@ const Login = () => {
       if (error) {
         console.error('Login error:', error);
         toast({
-          title: "Login Failed",
+          title: t('validation_error'),
           description: error.message || "Invalid email or password",
           variant: "destructive",
         });
       } else {
         toast({
-          title: "Success!",
-          description: "Welcome back!",
+          title: t('login_title'),
+          description: t('splash_welcome'),
         });
         navigate('/');
       }
     } catch (error) {
       console.error('Login error:', error);
       toast({
-        title: "Error",
+        title: t('validation_error'),
         description: "An unexpected error occurred",
         variant: "destructive",
       });
@@ -75,8 +75,8 @@ const Login = () => {
     
     if (!email.trim() || !password.trim()) {
       toast({
-        title: "Error",
-        description: "Please enter both email and password",
+        title: t('validation_error'),
+        description: t('required_field'),
         variant: "destructive",
       });
       return;
@@ -84,7 +84,7 @@ const Login = () => {
 
     if (password.length < 6) {
       toast({
-        title: "Error",
+        title: t('validation_error'),
         description: "Password must be at least 6 characters long",
         variant: "destructive",
       });
@@ -99,20 +99,20 @@ const Login = () => {
       if (error) {
         console.error('Sign up error:', error);
         toast({
-          title: "Sign Up Failed",
+          title: t('validation_error'),
           description: error.message || "Failed to create account",
           variant: "destructive",
         });
       } else {
         toast({
-          title: "Success!",
+          title: t('create_new_account'),
           description: "Account created! Please check your email to confirm your account.",
         });
       }
     } catch (error) {
       console.error('Sign up error:', error);
       toast({
-        title: "Error",
+        title: t('validation_error'),
         description: "An unexpected error occurred",
         variant: "destructive",
       });
@@ -124,18 +124,29 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-xl">
-        <CardHeader className="text-center">
+        <CardHeader className="text-center relative">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleLanguage}
+            className="absolute top-2 right-2 h-8 w-8 p-0"
+          >
+            <Languages className="h-4 w-4" />
+          </Button>
           <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             MOIRECIPT
           </CardTitle>
-          <p className="text-gray-600">Welcome to your receipt management system</p>
+          <p className="text-gray-600">{t('professional_billing_solution')}</p>
+          <div className="text-xs text-gray-500 mt-2">
+            {language === 'en' ? 'English' : 'தமிழ்'}
+          </div>
         </CardHeader>
         
         <CardContent>
           <Tabs defaultValue="signin" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsTrigger value="signin">{t('login')}</TabsTrigger>
+              <TabsTrigger value="signup">{t('create_new_account')}</TabsTrigger>
             </TabsList>
             
             <TabsContent value="signin">
@@ -145,7 +156,7 @@ const Login = () => {
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
                       type="email"
-                      placeholder="Enter your email"
+                      placeholder={t('enter_login_id_email')}
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="pl-10"
@@ -156,7 +167,7 @@ const Login = () => {
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
                       type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
+                      placeholder={t('enter_password')}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="pl-10 pr-10"
@@ -176,7 +187,7 @@ const Login = () => {
                   className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Signing In..." : "Sign In"}
+                  {isLoading ? t('logging_in') : t('login')}
                 </Button>
               </form>
             </TabsContent>
@@ -188,7 +199,7 @@ const Login = () => {
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
                       type="email"
-                      placeholder="Enter your email"
+                      placeholder={t('enter_login_id_email')}
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="pl-10"
@@ -199,7 +210,7 @@ const Login = () => {
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
                       type={showPassword ? "text" : "password"}
-                      placeholder="Create a password (min 6 characters)"
+                      placeholder={`${t('password')} (${language === 'en' ? 'min 6 characters' : 'குறைந்தது 6 எழுத்துகள்'})`}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="pl-10 pr-10"
@@ -220,11 +231,15 @@ const Login = () => {
                   className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Creating Account..." : "Create Account"}
+                  {isLoading ? (language === 'en' ? "Creating Account..." : "கணக்கை உருவாக்குகிறது...") : t('create_new_account')}
                 </Button>
               </form>
             </TabsContent>
           </Tabs>
+          
+          <div className="mt-6 text-center text-sm text-gray-500">
+            <p>{t('all_rights_reserved')}</p>
+          </div>
         </CardContent>
       </Card>
     </div>
