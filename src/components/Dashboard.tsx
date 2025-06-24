@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -196,7 +195,7 @@ const Dashboard = () => {
             </h1>
             {user && (
               <span className="text-sm text-gray-600 ml-4">
-                Welcome, {user.loginId}
+                Welcome, {user.email}
               </span>
             )}
           </div>
