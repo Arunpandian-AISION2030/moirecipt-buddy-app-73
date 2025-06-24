@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -37,53 +36,142 @@ const MOIReceiptPrint = ({ receiptData, customerData, onBack }: MOIReceiptPrintP
   const [showBluetoothPrinter, setShowBluetoothPrinter] = useState(false);
   const [printFunction, setPrintFunction] = useState<((text: string) => Promise<void>) | null>(null);
 
+  const getPaymentModeInTamil = (mode: string) => {
+    const tamilModes: { [key: string]: string } = {
+      'cash': 'ரூபாய் காசாக',
+      'card': 'கார்டாக',
+      'upi': 'UPI ஆக',
+      'gpay': 'GPay ஆக',
+      'cheque': 'காசோலையாக'
+    };
+    return language === 'ta' ? (tamilModes[mode] || mode) : mode;
+  };
+
+  const getFunctionTypeInTamil = (type: string) => {
+    const tamilTypes: { [key: string]: string } = {
+      'wedding': 'கல்யாணம்',
+      'birthday': 'வயது விழா',
+      'anniversary': 'ஆண்டு விழா',
+      'puberty': 'பூப்புனித விழா',
+      'engagement': 'நிச்சயதார்த்தம்',
+      'housewarming': 'கிரகப்பிரவேசம்'
+    };
+    return language === 'ta' ? (tamilTypes[type] || type) : type;
+  };
+
   const generateMOIReceiptText = (receipt: MOIReceiptData) => {
-    return `
+    if (language === 'ta') {
+      return `
+-----------------------------------------
+              MOI ரசீது
+-----------------------------------------
+வாடிக்கையாளர் பெயர்: ${receipt.customerName}
+நிகழ்வு: ${getFunctionTypeInTamil(receipt.functionType)}
+தேதி: ${receipt.functionDate}
+இடம்: ${customerData.venue}
+
+பங்களிப்பாளர்கள்:
+
+${receipt.contributorName} – ₹${receipt.amount} (${getPaymentModeInTamil(receipt.paymentMode)})
+
+மொத்த தொகை: ₹${receipt.amount}
+
+ரசீது உருவாக்கப்பட்ட நேரம்:
+${new Date().toLocaleDateString('ta-IN')}, ${new Date().toLocaleTimeString('ta-IN')}
+
+💼 நிறுவனம்: மொய்-ரசீது
+📞 தொடர்பு எண்: +91 81900 83059
+🌐 www.moireceipt.com
+      `.trim();
+    } else {
+      return `
 -----------------------------------------
               MOI RECEIPT
 -----------------------------------------
-Name           : ${receipt.contributorName}
-Place          : ${receipt.contributorPlace || 'N/A'}
-Relationship   : ${receipt.relationship || 'N/A'}
-MOI Amount     : ₹${receipt.amount}
-
-Function       : ${receipt.functionType}
+Customer Name  : ${receipt.customerName}
+Event          : ${receipt.functionType}
 Date           : ${receipt.functionDate}
------------------------------------------
-Thank you for your presence and blessings!
+Venue          : ${customerData.venue}
 
-Contact: www.moireceipt.com | 8248960558
-${language === 'ta' ? 'தமிழ் / English' : 'Tamil / English'}
-    `.trim();
+Contributors:
+
+${receipt.contributorName} – ₹${receipt.amount} (${receipt.paymentMode})
+
+Total Amount: ₹${receipt.amount}
+
+Receipt Generated:
+${new Date().toLocaleDateString()}, ${new Date().toLocaleTimeString()}
+
+💼 Company: Moi-Receipt
+📞 Contact: +91 81900 83059
+🌐 www.moireceipt.com
+      `.trim();
+    }
   };
 
   const generateSummaryText = () => {
     const totalAmount = receiptData.reduce((sum, receipt) => sum + parseFloat(receipt.amount || '0'), 0);
     
-    return `
-${language === 'ta' ? 'மோஇரிசிப்ட் - MOI சுருக்கம்' : 'Moirecipt - MOI Summary'}
+    if (language === 'ta') {
+      return `
+மொய்-ரசீது - MOI சுருக்கம்
 ================================
 
-${language === 'ta' ? 'நிகழ்ச்சி விவரங்கள்' : 'FUNCTION DETAILS'}
+நிகழ்ச்சி விவரங்கள்
 --------------------------------
-${language === 'ta' ? 'வாடிக்கையாளர்' : 'Customer'}: ${customerData.customerName}
-${language === 'ta' ? 'நிகழ்ச்சி வகை' : 'Function Type'}: ${customerData.functionType}
-${language === 'ta' ? 'தேதி' : 'Date'}: ${customerData.functionDate}
-${language === 'ta' ? 'இடம்' : 'Venue'}: ${customerData.venue}
+வாடிக்கையாளர் பெயர்: ${customerData.customerName}
+நிகழ்வு: ${getFunctionTypeInTamil(customerData.functionType)}
+தேதி: ${customerData.functionDate}
+இடம்: ${customerData.venue}
 
-${language === 'ta' ? 'பங்களிப்பு சுருக்கம்' : 'CONTRIBUTION SUMMARY'}
+பங்களிப்பு சுருக்கம்
 ================================
-${language === 'ta' ? 'மொத்த பங்களிப்புகள்' : 'Total Contributions'}: ${receiptData.length}
-${language === 'ta' ? 'மொத்த தொகை' : 'Total Amount'}: ₹${totalAmount.toLocaleString('en-IN')}
+மொத்த பங்களிப்புகள்: ${receiptData.length}
+மொத்த தொகை: ₹${totalAmount.toLocaleString('ta-IN')}
 
-${language === 'ta' ? 'பங்களிப்பாளர்கள் பட்டியல்' : 'CONTRIBUTORS LIST'}
+பங்களிப்பாளர்கள் பட்டியல்
 --------------------------------
 ${receiptData.map((receipt, index) => 
-  `${index + 1}. ${receipt.contributorName} - ₹${receipt.amount}`
+  `${index + 1}. ${receipt.contributorName} – ₹${receipt.amount} (${getPaymentModeInTamil(receipt.paymentMode)})`
 ).join('\n')}
 
-${language === 'ta' ? 'உருவாக்கப்பட்ட நேரம்' : 'Generated'}: ${new Date().toLocaleString()}
-    `.trim();
+ரசீது உருவாக்கப்பட்ட நேரம்:
+${new Date().toLocaleDateString('ta-IN')}, ${new Date().toLocaleTimeString('ta-IN')}
+
+💼 நிறுவனம்: மொய்-ரசீது
+📞 தொடர்பு எண்: +91 81900 83059
+🌐 www.moireceipt.com
+      `.trim();
+    } else {
+      return `
+Moi-Receipt - MOI Summary
+================================
+
+FUNCTION DETAILS
+--------------------------------
+Customer: ${customerData.customerName}
+Function Type: ${customerData.functionType}
+Date: ${customerData.functionDate}
+Venue: ${customerData.venue}
+
+CONTRIBUTION SUMMARY
+================================
+Total Contributions: ${receiptData.length}
+Total Amount: ₹${totalAmount.toLocaleString('en-IN')}
+
+CONTRIBUTORS LIST
+--------------------------------
+${receiptData.map((receipt, index) => 
+  `${index + 1}. ${receipt.contributorName} - ₹${receipt.amount} (${receipt.paymentMode})`
+).join('\n')}
+
+Generated: ${new Date().toLocaleString()}
+
+💼 Company: Moi-Receipt
+📞 Contact: +91 81900 83059
+🌐 www.moireceipt.com
+      `.trim();
+    }
   };
 
   const handlePrintIndividualReceipt = async (receipt: MOIReceiptData) => {
@@ -200,11 +288,11 @@ ${language === 'ta' ? 'உருவாக்கப்பட்ட நேரம�
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <p><strong>{language === 'ta' ? 'வாடிக்கையாளர்:' : 'Customer:'}</strong> {customerData.customerName}</p>
-                <p><strong>{language === 'ta' ? 'நிகழ்ச்சி:' : 'Function:'}</strong> {customerData.functionType}</p>
+                <p><strong>{language === 'ta' ? 'நிகழ்ச்சி:' : 'Function:'}</strong> {language === 'ta' ? getFunctionTypeInTamil(customerData.functionType) : customerData.functionType}</p>
               </div>
               <div>
                 <p><strong>{language === 'ta' ? 'மொத்த பங்களிப்புகள்:' : 'Total Contributions:'}</strong> {receiptData.length}</p>
-                <p><strong>{language === 'ta' ? 'மொத்த தொகை:' : 'Total Amount:'}</strong> ₹{totalAmount.toLocaleString('en-IN')}</p>
+                <p><strong>{language === 'ta' ? 'மொத்த தொகை:' : 'Total Amount:'}</strong> ₹{totalAmount.toLocaleString(language === 'ta' ? 'ta-IN' : 'en-IN')}</p>
               </div>
             </div>
           </CardContent>
@@ -221,19 +309,37 @@ ${language === 'ta' ? 'உருவாக்கப்பட்ட நேரம�
               <CardContent className="p-6">
                 {/* Preview of Receipt */}
                 <div className="bg-gray-50 p-4 rounded-lg mb-4 font-mono text-sm">
-                  <div className="text-center font-bold mb-2">MOI RECEIPT</div>
-                  <div className="border-t border-b border-gray-300 py-2 space-y-1">
-                    <div><strong>Name:</strong> {receipt.contributorName}</div>
-                    <div><strong>Place:</strong> {receipt.contributorPlace || 'N/A'}</div>
-                    <div><strong>Relationship:</strong> {receipt.relationship || 'N/A'}</div>
-                    <div><strong>MOI Amount:</strong> ₹{receipt.amount}</div>
+                  <div className="text-center font-bold mb-2">
+                    {language === 'ta' ? 'MOI ரசீது' : 'MOI RECEIPT'}
                   </div>
-                  <div className="pt-2 space-y-1">
-                    <div><strong>Function:</strong> {receipt.functionType}</div>
-                    <div><strong>Date:</strong> {receipt.functionDate}</div>
+                  <div className="border-t border-b border-gray-300 py-2 space-y-1">
+                    {language === 'ta' ? (
+                      <>
+                        <div><strong>வாடிக்கையாளர் பெயர்:</strong> {receipt.customerName}</div>
+                        <div><strong>நிகழ்வு:</strong> {getFunctionTypeInTamil(receipt.functionType)}</div>
+                        <div><strong>தேதி:</strong> {receipt.functionDate}</div>
+                        <div><strong>இடம்:</strong> {customerData.venue}</div>
+                        <div className="pt-2 border-t">
+                          <strong>பங்களிப்பாளர்:</strong> {receipt.contributorName} – ₹{receipt.amount} ({getPaymentModeInTamil(receipt.paymentMode)})
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div><strong>Customer:</strong> {receipt.customerName}</div>
+                        <div><strong>Event:</strong> {receipt.functionType}</div>
+                        <div><strong>Date:</strong> {receipt.functionDate}</div>
+                        <div><strong>Venue:</strong> {customerData.venue}</div>
+                        <div className="pt-2 border-t">
+                          <strong>Contributor:</strong> {receipt.contributorName} – ₹{receipt.amount} ({receipt.paymentMode})
+                        </div>
+                      </>
+                    )}
                   </div>
                   <div className="text-center text-xs mt-2 text-gray-600">
-                    Thank you for your presence and blessings!
+                    {language === 'ta' ? 
+                      '💼 நிறுவனம்: மொய்-ரசீது | 📞 +91 81900 83059' : 
+                      '💼 Company: Moi-Receipt | 📞 +91 81900 83059'
+                    }
                   </div>
                 </div>
                 
