@@ -6,12 +6,25 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
-// Main function to save a complete entry
+// Main function to save a complete entry with user authentication
 export const saveFullEntry = async () => {
   try {
     console.log('Starting saveFullEntry...')
     
-    // Step 1: Insert into functions table
+    // Check if user is authenticated
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    
+    if (authError || !user) {
+      console.error('User not authenticated:', authError)
+      return {
+        success: false,
+        error: 'User must be logged in to save entries'
+      }
+    }
+
+    console.log('User authenticated:', user.id)
+    
+    // Step 1: Insert into functions table with user_id
     console.log('Step 1: Inserting into functions table...')
     const { data: functionData, error: functionError } = await supabase
       .from('functions')
@@ -21,7 +34,8 @@ export const saveFullEntry = async () => {
           mobile: '9876543210',
           function_type: 'Wedding',
           date_of_function: '2025-07-01',
-          venue: 'Sivakasi'
+          venue: 'Sivakasi',
+          user_id: user.id
         }
       ])
       .select()
@@ -35,7 +49,7 @@ export const saveFullEntry = async () => {
     console.log('Function inserted successfully:', functionData)
     const functionId = functionData.id
 
-    // Step 2: Insert guests using the generated function_id
+    // Step 2: Insert guests using the generated function_id and user_id
     console.log('Step 2: Inserting guests with function_id:', functionId)
     const { data: guestsData, error: guestsError } = await supabase
       .from('guests')
@@ -45,14 +59,16 @@ export const saveFullEntry = async () => {
           guest_name: 'Rajesh',
           native_place: 'Virudhunagar',
           amount: 1000,
-          payment_mode: 'Cash'
+          payment_mode: 'Cash',
+          user_id: user.id
         },
         {
           function_id: functionId,
           guest_name: 'Santhosh',
           native_place: 'Chennai',
           amount: 1500,
-          payment_mode: 'UPI'
+          payment_mode: 'UPI',
+          user_id: user.id
         }
       ])
       .select()

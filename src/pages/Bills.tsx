@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BillEntryForm from "@/components/BillEntryForm";
@@ -14,6 +13,7 @@ import { saveFullEntry } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import MobileHeader from "@/components/MobileHeader";
 import MobileCard from "@/components/MobileCard";
+import { useAuth } from "@/hooks/use-auth";
 
 interface BillData {
   clientName: string;
@@ -36,6 +36,7 @@ const Bills = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const { isAuthenticated, user } = useAuth();
   const [currentView, setCurrentView] = useState<ViewType>('menu');
   const [currentBillData, setCurrentBillData] = useState<BillData | null>(null);
   const [customerFunctionData, setCustomerFunctionData] = useState<CustomerFunctionData | null>(null);
@@ -67,6 +68,15 @@ const Bills = () => {
   };
 
   const handleSaveFullEntry = async () => {
+    if (!isAuthenticated || !user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to save entries to the database",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const result = await saveFullEntry();
       if (result.success) {
@@ -77,7 +87,7 @@ const Bills = () => {
       } else {
         toast({
           title: "Error",
-          description: "Failed to save entry",
+          description: result.error?.message || "Failed to save entry",
           variant: "destructive",
         });
       }
@@ -147,6 +157,9 @@ const Bills = () => {
               >
                 <Database className="mr-3" size={20} />
                 Test Supabase Connection
+                {!isAuthenticated && (
+                  <span className="ml-2 text-xs bg-white/20 px-2 py-1 rounded">Login Required</span>
+                )}
               </Button>
             </div>
           </div>
@@ -244,6 +257,9 @@ const Bills = () => {
             >
               <Database className="mr-2" size={20} />
               Test Supabase Connection
+              {!isAuthenticated && (
+                <span className="ml-2 text-xs bg-white/20 px-2 py-1 rounded">Login Required</span>
+              )}
             </Button>
           </div>
         </div>

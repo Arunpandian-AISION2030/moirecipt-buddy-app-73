@@ -24,8 +24,8 @@ const MobileHeader = ({ title, onBack, showBackButton = false, showMenu = false 
   const { logout, user } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate('/login');
   };
 
@@ -107,7 +107,7 @@ const MobileHeader = ({ title, onBack, showBackButton = false, showMenu = false 
       
       {user && (
         <div className="px-4 pb-2">
-          <p className="text-blue-100 text-xs truncate">Welcome, {user.loginId}</p>
+          <p className="text-blue-100 text-xs truncate">Welcome, {user.email}</p>
         </div>
       )}
     </div>
