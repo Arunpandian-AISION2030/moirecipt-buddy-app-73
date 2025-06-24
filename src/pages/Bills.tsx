@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BillEntryForm from "@/components/BillEntryForm";
@@ -8,7 +7,9 @@ import MOIReceiptEntry from "@/components/MOIReceiptEntry";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Languages, FileText, Receipt } from "lucide-react";
+import { ArrowLeft, Languages, FileText, Receipt, Database } from "lucide-react";
+import { saveFullEntry } from "@/lib/supabase";
+import { useToast } from "@/hooks/use-toast";
 
 interface BillData {
   clientName: string;
@@ -29,6 +30,7 @@ type ViewType = 'menu' | 'customer-function' | 'moi-receipt' | 'form' | 'summary
 const Bills = () => {
   const { t, toggleLanguage, language } = useLanguage();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [currentView, setCurrentView] = useState<ViewType>('menu');
   const [currentBillData, setCurrentBillData] = useState<BillData | null>(null);
   const [customerFunctionData, setCustomerFunctionData] = useState<CustomerFunctionData | null>(null);
@@ -57,6 +59,31 @@ const Bills = () => {
 
   const handleMOIReceiptBack = () => {
     setCurrentView('customer-function');
+  };
+
+  const handleSaveFullEntry = async () => {
+    try {
+      const result = await saveFullEntry();
+      if (result.success) {
+        toast({
+          title: "Success!",
+          description: "Full entry saved successfully to Supabase",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to save entry",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Error calling saveFullEntry:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save entry",
+        variant: "destructive",
+      });
+    }
   };
 
   // Menu View
@@ -96,7 +123,7 @@ const Bills = () => {
             <p className="text-sm sm:text-base text-gray-600">{t('choose_bill_type')}</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6">
             {/* MOI Receipt Option */}
             <Card 
               onClick={() => setCurrentView('customer-function')}
@@ -140,6 +167,17 @@ const Bills = () => {
                 </div>
               </CardContent>
             </Card>
+          </div>
+
+          {/* Test Supabase Button */}
+          <div className="flex justify-center">
+            <Button
+              onClick={handleSaveFullEntry}
+              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 rounded-lg shadow-lg"
+            >
+              <Database className="mr-2" size={20} />
+              Test Supabase Connection
+            </Button>
           </div>
         </div>
       </div>

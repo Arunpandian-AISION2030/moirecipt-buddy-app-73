@@ -9,7 +9,101 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      functions: {
+        Row: {
+          created_at: string | null
+          customer_name: string
+          date_of_function: string | null
+          function_type: string | null
+          id: string
+          mobile: string | null
+          venue: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          customer_name: string
+          date_of_function?: string | null
+          function_type?: string | null
+          id?: string
+          mobile?: string | null
+          venue?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          customer_name?: string
+          date_of_function?: string | null
+          function_type?: string | null
+          id?: string
+          mobile?: string | null
+          venue?: string | null
+        }
+        Relationships: []
+      }
+      guest: {
+        Row: {
+          amount: number | null
+          created_at: string | null
+          function_id: string
+          guest_name: string | null
+          native_place: string | null
+          payment_mode: string | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string | null
+          function_id: string
+          guest_name?: string | null
+          native_place?: string | null
+          payment_mode?: string | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string | null
+          function_id?: string
+          guest_name?: string | null
+          native_place?: string | null
+          payment_mode?: string | null
+        }
+        Relationships: []
+      }
+      guests: {
+        Row: {
+          amount: number | null
+          created_at: string | null
+          function_id: string
+          guest_name: string
+          id: string
+          native_place: string | null
+          payment_mode: string | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string | null
+          function_id: string
+          guest_name: string
+          id?: string
+          native_place?: string | null
+          payment_mode?: string | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string | null
+          function_id?: string
+          guest_name?: string
+          id?: string
+          native_place?: string | null
+          payment_mode?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guests_function_id_fkey"
+            columns: ["function_id"]
+            isOneToOne: false
+            referencedRelation: "functions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
