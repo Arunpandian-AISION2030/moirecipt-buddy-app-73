@@ -186,6 +186,25 @@ const translations = {
     select_category: "Select category", 
     dropdown_select: "Or select from dropdown:",
     choose_category: "Choose category...",
+
+    // Login Screen
+    login_title: "Welcome Back!",
+    professional_billing_solution: "Professional Billing Solution",
+    enter_credentials_to_continue: "Enter your credentials to continue",
+    login_id_email: "Login ID / Email",
+    enter_login_id_email: "Enter your login ID or email",
+    password: "Password",
+    enter_password: "Enter your password",
+    remember_me: "Remember me",
+    forgot_password: "Forgot Password?",
+    login: "Login",
+    logging_in: "Logging in...",
+    or: "OR",
+    demo_mode: "Demo Mode",
+    enter_any_credentials: "Enter any credentials to login",
+    dont_have_account: "Don't have an account?",
+    create_new_account: "Create New Account",
+    all_rights_reserved: "All rights reserved",
   },
   ta: {
     // Splash Screen  
@@ -364,6 +383,25 @@ const translations = {
     select_category: "வகையை தேர்ந்தெடுக்கவும்",
     dropdown_select: "அல்லது கீழ்விழுப்பட்டியலில் இருந்து தேர்ந்தெடுக்கவும்:",
     choose_category: "வகையை தேர்ந்தெடுக்கவும்...",
+    
+    // Login Screen
+    login_title: "மீண்டும் வரவேற்கிறோம்!",
+    professional_billing_solution: "தொழில்முறை பில்லிங் சேவை",
+    enter_credentials_to_continue: "தொடர உங்கள் விவரங்களை உள்ளிடவும்",
+    login_id_email: "லாகின் ஐடி / மின்னஞ்சல்",
+    enter_login_id_email: "உங்கள் லாகின் ஐடி அல்லது மின்னஞ்சலை உள்ளிடவும்",
+    password: "கடவுச்சொல்",
+    enter_password: "உங்கள் கடவுச்சொல்லை உள்ளிடவும்",
+    remember_me: "என்னை நினைவில் வைத்துக் கொள்ளுங்கள்",
+    forgot_password: "கடவுச்சொல் மறந்துவிட்டதா?",
+    login: "உள்நுழை",
+    logging_in: "உள்நுழைகிறது...",
+    or: "அல்லது",
+    demo_mode: "டெமோ முறை",
+    enter_any_credentials: "உள்நுழைய எந்த விவரங்களையும் உள்ளிடவும்",
+    dont_have_account: "கணக்கு இல்லையா?",
+    create_new_account: "புதிய கணக்கை உருவாக்கவும்",
+    all_rights_reserved: "அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை",
   }
 };
 

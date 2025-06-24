@@ -1,10 +1,9 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Camera, Upload, Plus, TrendingUp, Receipt, Languages, PartyPopper, FileText, Home } from "lucide-react";
+import { Camera, Upload, Plus, TrendingUp, Receipt, Languages, PartyPopper, FileText, Home, LogIn } from "lucide-react";
 import AddReceiptModal from "./AddReceiptModal";
 
 const Dashboard = () => {
@@ -29,6 +28,10 @@ const Dashboard = () => {
     console.log('Already on receipts page');
   };
 
+  const handleNavigateToLogin = () => {
+    navigate('/login');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-green-50">
       {/* Header - Responsive */}
@@ -41,6 +44,15 @@ const Dashboard = () => {
             </h1>
           </div>
           <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleNavigateToLogin}
+              className="flex items-center gap-2 text-xs sm:text-sm"
+            >
+              <LogIn size={16} />
+              {t('login')}
+            </Button>
             <Button
               variant="outline"
               size="sm"
