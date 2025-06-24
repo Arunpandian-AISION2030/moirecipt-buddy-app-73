@@ -17,6 +17,7 @@ export type Database = {
           function_type: string | null
           id: string
           mobile: string | null
+          user_id: string | null
           venue: string | null
         }
         Insert: {
@@ -26,6 +27,7 @@ export type Database = {
           function_type?: string | null
           id?: string
           mobile?: string | null
+          user_id?: string | null
           venue?: string | null
         }
         Update: {
@@ -35,6 +37,7 @@ export type Database = {
           function_type?: string | null
           id?: string
           mobile?: string | null
+          user_id?: string | null
           venue?: string | null
         }
         Relationships: []
@@ -75,6 +78,7 @@ export type Database = {
           id: string
           native_place: string | null
           payment_mode: string | null
+          user_id: string | null
         }
         Insert: {
           amount?: number | null
@@ -84,6 +88,7 @@ export type Database = {
           id?: string
           native_place?: string | null
           payment_mode?: string | null
+          user_id?: string | null
         }
         Update: {
           amount?: number | null
@@ -93,6 +98,7 @@ export type Database = {
           id?: string
           native_place?: string | null
           payment_mode?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
