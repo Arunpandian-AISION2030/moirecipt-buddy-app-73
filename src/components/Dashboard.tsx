@@ -3,11 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Camera, Upload, Plus, TrendingUp, Receipt, Languages, PartyPopper, FileText, Home, LogIn } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Camera, Upload, Plus, TrendingUp, Receipt, Languages, PartyPopper, FileText, Home, LogOut } from "lucide-react";
 import AddReceiptModal from "./AddReceiptModal";
 
 const Dashboard = () => {
   const { t, toggleLanguage, language } = useLanguage();
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
   const [showAddReceipt, setShowAddReceipt] = useState(false);
 
@@ -28,7 +30,8 @@ const Dashboard = () => {
     console.log('Already on receipts page');
   };
 
-  const handleNavigateToLogin = () => {
+  const handleLogout = () => {
+    logout();
     navigate('/login');
   };
 
@@ -42,16 +45,21 @@ const Dashboard = () => {
             <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               MOIRECIPT
             </h1>
+            {user && (
+              <span className="text-sm text-gray-600 ml-4">
+                Welcome, {user.loginId}
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
-              onClick={handleNavigateToLogin}
+              onClick={handleLogout}
               className="flex items-center gap-2 text-xs sm:text-sm"
             >
-              <LogIn size={16} />
-              {t('login')}
+              <LogOut size={16} />
+              {t('logout') || 'Logout'}
             </Button>
             <Button
               variant="outline"

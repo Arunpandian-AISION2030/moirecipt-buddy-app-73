@@ -7,11 +7,15 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { Languages, Receipt, ArrowLeft } from "lucide-react";
 import PasswordInput from "@/components/PasswordInput";
+import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
   const { t, toggleLanguage, language } = useLanguage();
+  const { login } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
   const [loginId, setLoginId] = useState('');
   const [password, setPassword] = useState('');
@@ -22,14 +26,30 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate login process
-    setTimeout(() => {
-      setIsLoading(false);
-      // For demo purposes, accept any credentials
-      if (loginId && password) {
+    try {
+      const success = await login(loginId, password);
+      if (success) {
+        toast({
+          title: t('login_successful') || 'Login Successful',
+          description: t('welcome_back') || 'Welcome back!',
+        });
         navigate('/');
+      } else {
+        toast({
+          title: t('login_failed') || 'Login Failed',
+          description: t('invalid_credentials') || 'Please check your credentials and try again.',
+          variant: 'destructive',
+        });
       }
-    }, 1500);
+    } catch (error) {
+      toast({
+        title: t('login_error') || 'Login Error',
+        description: t('login_error_message') || 'An error occurred during login. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleBackToHome = () => {
@@ -65,16 +85,6 @@ const Login = () => {
         <Card className="shadow-2xl border-0 bg-white/90 backdrop-blur-sm">
           <CardHeader className="space-y-4 pb-6">
             <div className="flex items-center justify-between">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleBackToHome}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <ArrowLeft size={16} className="mr-1" />
-                {t('back')}
-              </Button>
-              
               <Button
                 variant="outline"
                 size="sm"
