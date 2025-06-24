@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +13,7 @@ import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import CustomerFunctionHistory from "./CustomerFunctionHistory";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export interface CustomerFunctionData {
   customerName: string;
@@ -31,6 +31,7 @@ interface CustomerFunctionEntryProps {
 const CustomerFunctionEntry = ({ onBack, onNext }: CustomerFunctionEntryProps) => {
   const { t, toggleLanguage, language } = useLanguage();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   
   const [formData, setFormData] = useState<CustomerFunctionData>({
     customerName: "",
@@ -129,11 +130,11 @@ const CustomerFunctionEntry = ({ onBack, onNext }: CustomerFunctionEntryProps) =
               <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="entry" className="flex items-center gap-2">
                   <User size={16} />
-                  {t('new_entry')}
+                  {isMobile ? null : t('new_entry')}
                 </TabsTrigger>
                 <TabsTrigger value="history" className="flex items-center gap-2">
                   <History size={16} />
-                  {t('previous_entries')}
+                  {isMobile ? null : t('previous_entries')}
                 </TabsTrigger>
               </TabsList>
 
