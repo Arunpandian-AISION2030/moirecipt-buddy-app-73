@@ -1,12 +1,14 @@
 
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Search, Calendar, User, MapPin, Phone, Trash2 } from "lucide-react";
+import { Search, Calendar, User, MapPin, Phone, Trash2, Edit } from "lucide-react";
 import { format } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
 
 interface HistoryEntry {
   id: number;
@@ -18,8 +20,13 @@ interface HistoryEntry {
   createdAt: string;
 }
 
-const CustomerFunctionHistory = () => {
+interface CustomerFunctionHistoryProps {
+  onEditEntry?: (entry: HistoryEntry) => void;
+}
+
+const CustomerFunctionHistory = ({ onEditEntry }: CustomerFunctionHistoryProps) => {
   const { t } = useLanguage();
+  const { toast } = useToast();
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredHistory, setFilteredHistory] = useState<HistoryEntry[]>([]);
@@ -61,11 +68,30 @@ const CustomerFunctionHistory = () => {
     const updatedHistory = history.filter(entry => entry.id !== id);
     setHistory(updatedHistory);
     localStorage.setItem('customerFunctionHistory', JSON.stringify(updatedHistory));
+    toast({
+      title: t('success'),
+      description: t('entry_deleted_successfully'),
+    });
+  };
+
+  const handleEditEntry = (entry: HistoryEntry) => {
+    if (onEditEntry) {
+      onEditEntry(entry);
+    } else {
+      toast({
+        title: t('info'),
+        description: "Edit functionality will be available soon",
+      });
+    }
   };
 
   const clearAllHistory = () => {
     setHistory([]);
     localStorage.removeItem('customerFunctionHistory');
+    toast({
+      title: t('success'),
+      description: t('all_entries_cleared'),
+    });
   };
 
   const getFunctionTypeDisplay = (type: string) => {
@@ -164,7 +190,7 @@ const CustomerFunctionHistory = () => {
                       </div>
                     </TableHead>
                     <TableHead className="min-w-[120px]">{t('created_at')}</TableHead>
-                    <TableHead className="w-[80px]">{t('actions')}</TableHead>
+                    <TableHead className="w-[120px]">{t('actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -187,14 +213,26 @@ const CustomerFunctionHistory = () => {
                         {format(new Date(entry.createdAt), "MMM dd, yyyy HH:mm")}
                       </TableCell>
                       <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => deleteEntry(entry.id)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50 p-1"
-                        >
-                          <Trash2 size={16} />
-                        </Button>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditEntry(entry)}
+                            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 p-1"
+                            title="Edit Entry"
+                          >
+                            <Edit size={16} />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => deleteEntry(entry.id)}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50 p-1"
+                            title="Delete Entry"
+                          >
+                            <Trash2 size={16} />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -209,3 +247,4 @@ const CustomerFunctionHistory = () => {
 };
 
 export default CustomerFunctionHistory;
+

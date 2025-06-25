@@ -1,11 +1,12 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { ArrowLeft, ArrowRight, User, Languages, History } from "lucide-react";
+import { ArrowLeft, ArrowRight, User, Languages, History, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -23,6 +24,16 @@ export interface CustomerFunctionData {
   venuePlace: string;
 }
 
+interface HistoryEntry {
+  id: number;
+  customerName: string;
+  mobileNumber: string;
+  functionType: string;
+  functionDate: Date;
+  venuePlace: string;
+  createdAt: string;
+}
+
 interface CustomerFunctionEntryProps {
   onBack: () => void;
   onNext: (data: CustomerFunctionData) => void;
@@ -32,6 +43,9 @@ const CustomerFunctionEntry = ({ onBack, onNext }: CustomerFunctionEntryProps) =
   const { t, toggleLanguage, language } = useLanguage();
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const [activeTab, setActiveTab] = useState("entry");
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
   
   const [formData, setFormData] = useState<CustomerFunctionData>({
     customerName: "",
@@ -43,6 +57,24 @@ const CustomerFunctionEntry = ({ onBack, onNext }: CustomerFunctionEntryProps) =
 
   const handleInputChange = (field: keyof CustomerFunctionData, value: string | Date | undefined) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleEditEntry = (entry: HistoryEntry) => {
+    setFormData({
+      customerName: entry.customerName,
+      mobileNumber: entry.mobileNumber,
+      functionType: entry.functionType,
+      functionDate: entry.functionDate,
+      venuePlace: entry.venuePlace,
+    });
+    setIsEditing(true);
+    setEditingId(entry.id);
+    setActiveTab("entry");
+    
+    toast({
+      title: t('info'),
+      description: "Entry loaded for editing",
+    });
   };
 
   const validateForm = () => {
@@ -72,18 +104,46 @@ const CustomerFunctionEntry = ({ onBack, onNext }: CustomerFunctionEntryProps) =
 
   const handleNext = () => {
     if (validateForm()) {
-      // Save to localStorage for history
       const existingHistory = JSON.parse(localStorage.getItem('customerFunctionHistory') || '[]');
-      const newEntry = {
-        ...formData,
-        id: Date.now(),
-        createdAt: new Date().toISOString(),
-      };
-      existingHistory.unshift(newEntry);
-      localStorage.setItem('customerFunctionHistory', JSON.stringify(existingHistory.slice(0, 50))); // Keep only last 50 entries
+      
+      if (isEditing && editingId) {
+        // Update existing entry
+        const updatedHistory = existingHistory.map((entry: any) => 
+          entry.id === editingId 
+            ? { ...formData, id: editingId, createdAt: entry.createdAt }
+            : entry
+        );
+        localStorage.setItem('customerFunctionHistory', JSON.stringify(updatedHistory));
+        
+        toast({
+          title: t('success'),
+          description: "Entry updated successfully",
+        });
+      } else {
+        // Add new entry
+        const newEntry = {
+          ...formData,
+          id: Date.now(),
+          createdAt: new Date().toISOString(),
+        };
+        existingHistory.unshift(newEntry);
+        localStorage.setItem('customerFunctionHistory', JSON.stringify(existingHistory.slice(0, 50)));
+      }
       
       onNext(formData);
     }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditingId(null);
+    setFormData({
+      customerName: "",
+      mobileNumber: "",
+      functionType: "",
+      functionDate: undefined,
+      venuePlace: "",
+    });
   };
 
   return (
@@ -126,22 +186,34 @@ const CustomerFunctionEntry = ({ onBack, onNext }: CustomerFunctionEntryProps) =
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 sm:p-6">
-            <Tabs defaultValue="entry" className="w-full">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="entry" className="flex items-center gap-2">
-                  <User size={16} />
-                  {isMobile ? null : t('new_entry')}
+                  <Plus size={16} />
+                  {!isMobile && (isEditing ? "Edit Entry" : t('new_entry'))}
                 </TabsTrigger>
                 <TabsTrigger value="history" className="flex items-center gap-2">
                   <History size={16} />
-                  {isMobile ? null : t('previous_entries')}
+                  {!isMobile && t('previous_entries')}
                 </TabsTrigger>
               </TabsList>
 
               <TabsContent value="entry" className="space-y-6">
-                <h3 className="text-lg font-semibold text-center text-blue-700 mb-4">
-                  {t('step_1_customer_function')}
-                </h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold text-center text-blue-700">
+                    {isEditing ? "Edit Customer Function" : t('step_1_customer_function')}
+                  </h3>
+                  {isEditing && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCancelEdit}
+                      className="text-gray-600"
+                    >
+                      Cancel Edit
+                    </Button>
+                  )}
+                </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                   {/* Customer Name */}
@@ -246,14 +318,14 @@ const CustomerFunctionEntry = ({ onBack, onNext }: CustomerFunctionEntryProps) =
                     onClick={handleNext}
                     className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 sm:px-8 py-2"
                   >
-                    {t('next_step')}
+                    {isEditing ? "Update & Continue" : t('next_step')}
                     <ArrowRight className="ml-2" size={20} />
                   </Button>
                 </div>
               </TabsContent>
 
               <TabsContent value="history">
-                <CustomerFunctionHistory />
+                <CustomerFunctionHistory onEditEntry={handleEditEntry} />
               </TabsContent>
             </Tabs>
           </CardContent>
@@ -264,3 +336,4 @@ const CustomerFunctionEntry = ({ onBack, onNext }: CustomerFunctionEntryProps) =
 };
 
 export default CustomerFunctionEntry;
+
