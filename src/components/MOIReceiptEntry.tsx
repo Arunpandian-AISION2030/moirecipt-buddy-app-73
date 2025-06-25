@@ -196,12 +196,24 @@ const MOIReceiptEntry = ({ onBack, customerData, isEditing = false, editingFunct
       venue: customerData.venuePlace, // Map venuePlace to venue
     };
 
+    // Convert guests to receiptData format
+    const receiptData = guests.map((guest, index) => ({
+      receiptNumber: `MOI-${Date.now()}-${index + 1}`,
+      customerName: customerData.customerName,
+      functionType: customerData.functionType,
+      functionDate: customerData.functionDate ? customerData.functionDate.toISOString() : new Date().toISOString(),
+      contributorName: guest.guestName,
+      contributorPlace: guest.nativePlace,
+      amount: guest.amount,
+      paymentMode: guest.paymentMode,
+      timestamp: new Date().toISOString(),
+    }));
+
     return (
       <MOIReceiptPrint
+        receiptData={receiptData}
         customerData={printData}
-        guests={guests}
         onBack={() => setShowPrint(false)}
-        isEditing={isEditing}
       />
     );
   }
