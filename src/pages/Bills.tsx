@@ -40,6 +40,8 @@ const Bills = () => {
   const [currentView, setCurrentView] = useState<ViewType>('menu');
   const [currentBillData, setCurrentBillData] = useState<BillData | null>(null);
   const [customerFunctionData, setCustomerFunctionData] = useState<CustomerFunctionData | null>(null);
+  const [isEditingMode, setIsEditingMode] = useState(false);
+  const [editingFunctionId, setEditingFunctionId] = useState<number | null>(null);
 
   const handleViewSummary = (billData: BillData) => {
     setCurrentBillData(billData);
@@ -58,8 +60,10 @@ const Bills = () => {
     setCurrentView('menu');
   };
 
-  const handleCustomerFunctionNext = (data: CustomerFunctionData) => {
+  const handleCustomerFunctionNext = (data: CustomerFunctionData, isEditing?: boolean, editingId?: number) => {
     setCustomerFunctionData(data);
+    setIsEditingMode(isEditing || false);
+    setEditingFunctionId(editingId || null);
     setCurrentView('moi-receipt');
   };
 
@@ -283,6 +287,8 @@ const Bills = () => {
       <MOIReceiptEntry 
         onBack={handleMOIReceiptBack}
         customerData={customerFunctionData}
+        isEditing={isEditingMode}
+        editingFunctionId={editingFunctionId}
       />
     );
   }

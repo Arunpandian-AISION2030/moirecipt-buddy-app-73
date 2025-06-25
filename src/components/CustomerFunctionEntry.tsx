@@ -36,7 +36,7 @@ interface HistoryEntry {
 
 interface CustomerFunctionEntryProps {
   onBack: () => void;
-  onNext: (data: CustomerFunctionData) => void;
+  onNext: (data: CustomerFunctionData, isEditing?: boolean, editingId?: number) => void;
 }
 
 const CustomerFunctionEntry = ({ onBack, onNext }: CustomerFunctionEntryProps) => {
@@ -73,7 +73,7 @@ const CustomerFunctionEntry = ({ onBack, onNext }: CustomerFunctionEntryProps) =
     
     toast({
       title: t('info'),
-      description: "Entry loaded for editing",
+      description: "Entry loaded for editing. You can modify function details and add/edit guest entries.",
     });
   };
 
@@ -107,7 +107,7 @@ const CustomerFunctionEntry = ({ onBack, onNext }: CustomerFunctionEntryProps) =
       const existingHistory = JSON.parse(localStorage.getItem('customerFunctionHistory') || '[]');
       
       if (isEditing && editingId) {
-        // Update existing entry
+        // Update existing entry in localStorage
         const updatedHistory = existingHistory.map((entry: any) => 
           entry.id === editingId 
             ? { ...formData, id: editingId, createdAt: entry.createdAt }
@@ -117,8 +117,11 @@ const CustomerFunctionEntry = ({ onBack, onNext }: CustomerFunctionEntryProps) =
         
         toast({
           title: t('success'),
-          description: "Entry updated successfully",
+          description: "Function details updated. Proceeding to guest entries...",
         });
+        
+        // Pass editing info to next step
+        onNext(formData, true, editingId);
       } else {
         // Add new entry
         const newEntry = {
@@ -128,9 +131,9 @@ const CustomerFunctionEntry = ({ onBack, onNext }: CustomerFunctionEntryProps) =
         };
         existingHistory.unshift(newEntry);
         localStorage.setItem('customerFunctionHistory', JSON.stringify(existingHistory.slice(0, 50)));
+        
+        onNext(formData, false);
       }
-      
-      onNext(formData);
     }
   };
 
@@ -189,12 +192,20 @@ const CustomerFunctionEntry = ({ onBack, onNext }: CustomerFunctionEntryProps) =
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="entry" className="flex items-center gap-2">
-                  <Plus size={16} />
-                  {!isMobile && (isEditing ? "Edit Entry" : t('new_entry'))}
+                  {isMobile ? <Plus size={16} /> : (
+                    <>
+                      <Plus size={16} />
+                      {isEditing ? "Edit Entry" : t('new_entry')}
+                    </>
+                  )}
                 </TabsTrigger>
                 <TabsTrigger value="history" className="flex items-center gap-2">
-                  <History size={16} />
-                  {!isMobile && t('previous_entries')}
+                  {isMobile ? <History size={16} /> : (
+                    <>
+                      <History size={16} />
+                      {t('previous_entries')}
+                    </>
+                  )}
                 </TabsTrigger>
               </TabsList>
 
@@ -318,7 +329,7 @@ const CustomerFunctionEntry = ({ onBack, onNext }: CustomerFunctionEntryProps) =
                     onClick={handleNext}
                     className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 sm:px-8 py-2"
                   >
-                    {isEditing ? "Update & Continue" : t('next_step')}
+                    {isEditing ? "Update & Continue to Guests" : t('next_step')}
                     <ArrowRight className="ml-2" size={20} />
                   </Button>
                 </div>
@@ -336,4 +347,3 @@ const CustomerFunctionEntry = ({ onBack, onNext }: CustomerFunctionEntryProps) =
 };
 
 export default CustomerFunctionEntry;
-
