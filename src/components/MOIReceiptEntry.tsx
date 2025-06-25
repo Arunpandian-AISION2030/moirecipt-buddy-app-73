@@ -188,9 +188,17 @@ const MOIReceiptEntry = ({ onBack, customerData, isEditing = false, editingFunct
   };
 
   if (showPrint) {
+    // Map CustomerFunctionData to the format expected by MOIReceiptPrint
+    const printData = {
+      customerName: customerData.customerName,
+      functionType: customerData.functionType,
+      functionDate: customerData.functionDate ? customerData.functionDate.toISOString() : new Date().toISOString(),
+      venue: customerData.venuePlace, // Map venuePlace to venue
+    };
+
     return (
       <MOIReceiptPrint
-        customerData={customerData}
+        customerData={printData}
         guests={guests}
         onBack={() => setShowPrint(false)}
         isEditing={isEditing}
@@ -255,7 +263,7 @@ const MOIReceiptEntry = ({ onBack, customerData, isEditing = false, editingFunct
               <div>
                 <span className="font-medium text-gray-600">Date:</span>
                 <p className="text-gray-800">
-                  {customerData.functionDate ? new Date(customerData.functionDate).toLocaleDateString() : 'N/A'}
+                  {customerData.functionDate ? customerData.functionDate.toLocaleDateString() : 'N/A'}
                 </p>
               </div>
             </div>
