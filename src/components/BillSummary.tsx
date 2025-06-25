@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -104,6 +105,10 @@ ${t('advance_paid')}: ${formatAmount(billData.advancePaid)}
 ${t('balance_due')}: ${formatAmount(billData.balanceDue)}
 
 ${t('thank_you_message')}
+
+💼 Company: Moi-Receipt
+📞 Contact: +91 90808 06765
+🌐 www.moireceipt.com
 
 Generated: ${new Date().toLocaleString()}
     `.trim();
@@ -307,7 +312,11 @@ ${t('thank_you_message')}`;
             {/* Thank You Message */}
             <div className="text-center py-6 bg-gradient-to-r from-orange-100 to-red-100 rounded-lg border-2 border-orange-200">
               <p className="text-lg font-medium text-gray-800 mb-2">🙏</p>
-              <p className="text-gray-700">{t('thank_you_message')}</p>
+              <p className="text-gray-700 mb-3">{t('thank_you_message')}</p>
+              <div className="text-sm text-gray-600">
+                <p>💼 Company: Moi-Receipt | 📞 Contact: +91 90808 06765</p>
+                <p>🌐 www.moireceipt.com</p>
+              </div>
             </div>
           </CardContent>
         </Card>

@@ -1,11 +1,11 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Bluetooth, Printer, ArrowLeft } from "lucide-react";
-import { useState } from "react";
+import { Bluetooth, Printer, ArrowLeft, FileText } from "lucide-react";
+import { useState, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import BluetoothPrinterConnection from "./BluetoothPrinterConnection";
+import { useReactToPrint } from 'react-to-print';
 
 interface MOIReceiptData {
   receiptNumber: string;
@@ -35,6 +35,7 @@ const MOIReceiptPrint = ({ receiptData, customerData, onBack }: MOIReceiptPrintP
   const { toast } = useToast();
   const [showBluetoothPrinter, setShowBluetoothPrinter] = useState(false);
   const [printFunction, setPrintFunction] = useState<((text: string) => Promise<void>) | null>(null);
+  const printRef = useRef<HTMLDivElement>(null);
 
   const getPaymentModeInTamil = (mode: string) => {
     const tamilModes: { [key: string]: string } = {
@@ -80,7 +81,7 @@ ${receipt.contributorName} – ₹${receipt.amount} (${getPaymentModeInTamil(rec
 ${new Date().toLocaleDateString('ta-IN')}, ${new Date().toLocaleTimeString('ta-IN')}
 
 💼 நிறுவனம்: மொய்-ரசீது
-📞 தொடர்பு எண்: +91 81900 83059
+📞 தொடர்பு எண்: +91 90808 06765
 🌐 www.moireceipt.com
       `.trim();
     } else {
@@ -103,7 +104,7 @@ Receipt Generated:
 ${new Date().toLocaleDateString()}, ${new Date().toLocaleTimeString()}
 
 💼 Company: Moi-Receipt
-📞 Contact: +91 81900 83059
+📞 Contact: +91 90808 06765
 🌐 www.moireceipt.com
       `.trim();
     }
@@ -139,7 +140,7 @@ ${receiptData.map((receipt, index) =>
 ${new Date().toLocaleDateString('ta-IN')}, ${new Date().toLocaleTimeString('ta-IN')}
 
 💼 நிறுவனம்: மொய்-ரசீது
-📞 தொடர்பு எண்: +91 81900 83059
+📞 தொடர்பு எண்: +91 90808 06765
 🌐 www.moireceipt.com
       `.trim();
     } else {
@@ -168,11 +169,15 @@ ${receiptData.map((receipt, index) =>
 Generated: ${new Date().toLocaleString()}
 
 💼 Company: Moi-Receipt
-📞 Contact: +91 81900 83059
+📞 Contact: +91 90808 06765
 🌐 www.moireceipt.com
       `.trim();
     }
   };
+
+  const handlePrintA4Table = useReactToPrint({
+    content: () => printRef.current,
+  });
 
   const handlePrintIndividualReceipt = async (receipt: MOIReceiptData) => {
     if (!printFunction) {
@@ -274,14 +279,23 @@ Generated: ${new Date().toLocaleString()}
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>{language === 'ta' ? 'MOI சுருக்கம்' : 'MOI Summary'}</span>
-              <Button
-                onClick={handlePrintSummary}
-                disabled={!printFunction}
-                className="bg-gradient-to-r from-blue-600 to-purple-600"
-              >
-                <Printer className="mr-2" size={16} />
-                {language === 'ta' ? 'சுருக்கம் அச்சிடு' : 'Print Summary'}
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  onClick={handlePrintA4Table}
+                  className="bg-gradient-to-r from-orange-600 to-red-600"
+                >
+                  <FileText className="mr-2" size={16} />
+                  {language === 'ta' ? 'A4 அட்டவணை' : 'A4 Table'}
+                </Button>
+                <Button
+                  onClick={handlePrintSummary}
+                  disabled={!printFunction}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600"
+                >
+                  <Printer className="mr-2" size={16} />
+                  {language === 'ta' ? 'சுருக்கம் அச்சிடு' : 'Print Summary'}
+                </Button>
+              </div>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -298,7 +312,55 @@ Generated: ${new Date().toLocaleString()}
           </CardContent>
         </Card>
 
-        {/* Individual Receipts */}
+        {/* A4 Printable Table - Hidden but printable */}
+        <div ref={printRef} className="hidden print:block" style={{ width: '210mm', minHeight: '297mm', padding: '20mm' }}>
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold mb-2">MOI Receipt Summary Report</h1>
+            <p className="text-gray-600">Generated on {new Date().toLocaleDateString()}</p>
+            <div className="mt-4 text-left">
+              <p><strong>Customer:</strong> {customerData.customerName}</p>
+              <p><strong>Function:</strong> {customerData.functionType}</p>
+              <p><strong>Date:</strong> {customerData.functionDate}</p>
+              <p><strong>Venue:</strong> {customerData.venue}</p>
+            </div>
+          </div>
+          
+          <table className="w-full border-collapse border border-gray-300 text-sm">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="border border-gray-300 p-2 text-left">S.No</th>
+                <th className="border border-gray-300 p-2 text-left">Contributor Name</th>
+                <th className="border border-gray-300 p-2 text-left">Place</th>
+                <th className="border border-gray-300 p-2 text-left">Amount (₹)</th>
+                <th className="border border-gray-300 p-2 text-left">Payment Mode</th>
+              </tr>
+            </thead>
+            <tbody>
+              {receiptData.map((receipt, index) => (
+                <tr key={index}>
+                  <td className="border border-gray-300 p-2">{index + 1}</td>
+                  <td className="border border-gray-300 p-2">{receipt.contributorName}</td>
+                  <td className="border border-gray-300 p-2">{receipt.contributorPlace}</td>
+                  <td className="border border-gray-300 p-2">₹{parseFloat(receipt.amount).toLocaleString('en-IN')}</td>
+                  <td className="border border-gray-300 p-2">{receipt.paymentMode}</td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr className="bg-gray-50 font-bold">
+                <td colSpan={3} className="border border-gray-300 p-2 text-right">Total Amount:</td>
+                <td className="border border-gray-300 p-2">₹{totalAmount.toLocaleString('en-IN')}</td>
+                <td className="border border-gray-300 p-2"></td>
+              </tr>
+            </tfoot>
+          </table>
+          
+          <div className="mt-8 text-center text-sm text-gray-600">
+            <p>💼 Company: Moi-Receipt | 📞 Contact: +91 90808 06765 | 🌐 www.moireceipt.com</p>
+          </div>
+        </div>
+
+        {/* Individual Receipts - Existing code but with edit prevention for guests */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">
             {language === 'ta' ? 'தனிப்பட்ட ரசீதுகள்' : 'Individual Receipts'}
@@ -337,8 +399,8 @@ Generated: ${new Date().toLocaleString()}
                   </div>
                   <div className="text-center text-xs mt-2 text-gray-600">
                     {language === 'ta' ? 
-                      '💼 நிறுவனம்: மொய்-ரசீது | 📞 +91 81900 83059' : 
-                      '💼 Company: Moi-Receipt | 📞 +91 81900 83059'
+                      '💼 நிறுவனம்: மொய்-ரசீது | 📞 +91 90808 06765' : 
+                      '💼 Company: Moi-Receipt | 📞 +91 90808 06765'
                     }
                   </div>
                 </div>
@@ -347,6 +409,9 @@ Generated: ${new Date().toLocaleString()}
                   <div>
                     <p className="text-sm text-gray-600">
                       {language === 'ta' ? 'ரசீது எண்:' : 'Receipt No:'} {receipt.receiptNumber}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {language === 'ta' ? 'நிலை: பூர்த்தி செய்யப்பட்டது' : 'Status: Completed - Cannot Edit'}
                     </p>
                   </div>
                   <Button
